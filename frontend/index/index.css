@@ -729,14 +729,22 @@ body{
   right: 26px;
   width: 60px;
   height: 60px;
+  padding: 0;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  font-size: 22px;
-  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(135deg, #2dd4bf, #3b82f6);
   box-shadow: 0 10px 30px rgba(0,0,0,.5);
   z-index: 9999;
+}
+
+#chat-btn img{
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
 }
 
 #chat-btn .badge{
