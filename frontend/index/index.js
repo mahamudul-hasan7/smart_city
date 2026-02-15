@@ -528,16 +528,20 @@ function showTyping(show) {
 }
 
 function botReply(userText) {
-  // simple intent examples
+  // Enhanced intent detection with comprehensive responses
   const text = userText.toLowerCase();
-  let reply = "Thanks 😊 I’m online and ready to assist you.";
+  let reply = "Thanks for reaching out! 👋 I'm here to help with SmartCity questions.";
 
   if (text.includes("track")) {
-    reply = "You can track your complaint from Citizen Portal → Track Status. Enter your complaint ID to see timeline updates.";
+    reply = "📍 To track your complaint:\n✓ Citizen Portal → Track Status\n✓ Enter Complaint ID\n✓ View real-time updates";
   } else if (text.includes("submit") || text.includes("complaint")) {
-    reply = "To submit, open Citizen Portal → New Complaint. Add category, description, and location for faster routing.";
+    reply = "📝 To submit:\n✓ Citizen Portal → New Complaint\n✓ Select category\n✓ Add details & photos\n✓ Submit";
   } else if (text.includes("contact") || text.includes("support")) {
-    reply = "For support, please use the Contact option in the footer or email support@smartcity.local.";
+    reply = "💬 Support:\n📧 support@smartcity.local\n🏢 Available 24/7\nAverage response: <2 hours";
+  } else if (text.includes("department") || text.includes("handles")) {
+    reply = "🏢 Departments:\n• Road & Transport\n• Water & Sewerage\n• Waste Management\n• Health";
+  } else if (text.includes("priority")) {
+    reply = "⚡ Priority:\n🔴 High: Safety/Emergency\n🟡 Medium: Daily impact\n🔵 Low: Minor";
   }
 
   showTyping(true);
