@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Zone | SmartCity Admin</title>
+
+  <!-- shared admin css -->
+  <link rel="stylesheet" href="admin-shared.css">
+  <link rel="stylesheet" href="admin-dashboard.css">
+  <!-- add form css -->
+  <link rel="stylesheet" href="admin-add-zone.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- GLOBAL HEADER -->
+<header class="global-header">
+  <div class="header-left">
+    <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+    <a href="admin-dashboard.html" class="logo-text">Smart<span>City</span></a>
+  </div>
+  <div class="header-right">
+    <span class="page-title">Add Zone</span>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</header>
+
+<div class="layout" id="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <a href="admin-dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="admin-assign.html"><i class="fas fa-tasks"></i> Assign</a>
+    <a href="all-complaints.html"><i class="fas fa-list"></i> All Complaints</a>
+    <a href="admin-departments.html"><i class="fas fa-building"></i> Departments</a>
+    <a href="admin-staff.html"><i class="fas fa-users"></i> Staff</a>
+    <a class="active" href="admin-zones.html"><i class="fas fa-map-marker-alt"></i> Zones</a>
+    <a href="admin-reports.html"><i class="fas fa-file-alt"></i> Reports</a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+      <h1 class="page-title-main">Add Zone</h1>
+      <p class="page-subtitle">Register a new city zone with location details</p>
+    </section>
+
+    <!-- FORM SECTION -->
+    <section class="form-container">
+
+      <form id="zoneForm">
+
+        <div class="form-section">
+          <h3 class="form-section-title"><i class="fas fa-map-marker-alt"></i> Zone Information</h3>
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label>Zone ID <span class="auto-badge">Auto-Generated</span></label>
+              <input type="text" name="zone_id" id="zone_id" placeholder="Auto-generated" readonly>
+              <small class="next-id-info" id="nextIdInfo">Next Zone ID: --</small>
+              <span class="form-error" id="error-zone_id"></span>
+            </div>
+
+            <div class="form-group">
+              <label>Zone Name <span class="required">*</span></label>
+              <input type="text" id="zone_name" name="name" placeholder="e.g., Mirpur Zone" required>
+              <span class="form-error" id="error-zone_name"></span>
+            </div>
+
+            <div class="form-group">
+              <label>City <span class="required">*</span></label>
+              <input type="text" id="zone_city" name="city" value="Dhaka" readonly>
+              <span class="form-error" id="error-zone_city"></span>
+            </div>
+
+            <div class="form-group">
+              <label>Area Description</label>
+              <select id="zone_area" name="area_description">
+                <option value="">-- Select Area Description --</option>
+                <option value="Residential area">Residential area</option>
+                <option value="Commercial area">Commercial area</option>
+                <option value="Industrial area">Industrial area</option>
+                <option value="Mixed-use area">Mixed-use area</option>
+                <option value="Government zone">Government zone</option>
+              </select>
+              <span class="form-error" id="error-zone_area"></span>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Save Zone</button>
+          <a href="admin-zones.html" class="btn-cancel"><i class="fas fa-times"></i> Cancel</a>
+        </div>
+
+      </form>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- SAVING OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="save-box">
+    <div class="spinner" id="spinner"></div>
+
+    <svg class="checkmark" id="checkmark" viewBox="0 0 52 52">
+      <circle class="checkmark-circle" cx="26" cy="26" r="25"/>
+      <path class="checkmark-check" d="M14 27l7 7 17-17"/>
+    </svg>
+    <p class="save-text" id="saveText">Saving zone...</p>
+  </div>
+</div>
+
+<script src="admin-add-zone.js"></script>
+</body>
+</html>

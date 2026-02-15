@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Management | SmartCity</title>
+  <link rel="stylesheet" href="admin-shared.css">
+  <link rel="stylesheet" href="admin-staff.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- GLOBAL HEADER -->
+<header class="global-header">
+  <div class="header-left">
+    <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+    <a href="../index/index.html" class="logo-text">Smart<span>City</span></a>
+  </div>
+  <div class="header-right">
+    <span class="page-title">Staff Management</span>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</header>
+
+<div class="layout" id="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <a href="admin-dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="admin-assign.html"><i class="fas fa-tasks"></i> Assign</a>
+    <a href="all-complaints.html"><i class="fas fa-list"></i> All Complaints</a>
+    <a href="admin-departments.html"><i class="fas fa-building"></i> Departments</a>
+    <a class="active" href="admin-staff.html"><i class="fas fa-users"></i> Staff</a>
+    <a href="admin-zones.html"><i class="fas fa-map-marker-alt"></i> Zones</a>
+    <a href="admin-reports.html"><i class="fas fa-file-alt"></i> Reports</a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- PAGE HEADER WITH STAT -->
+    <section class="page-header-container">
+      <div class="page-header">
+        <h1 class="page-title-main">Staff Management</h1>
+        <p class="page-subtitle">Manage city staff, assignments, and responsibilities</p>
+      </div>
+
+      <div class="staff-stat-card">
+        <div class="staff-stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="staff-stat-content">
+          <span class="staff-stat-label">Total Staff</span>
+          <span class="staff-stat-value" id="totalStaff">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAFF TABLE -->
+    <section class="table-box">
+      <div class="table-header">
+        <h2>Staff List</h2>
+        <div class="header-actions">
+          <button class="btn-edit-mode" id="editModeToggle">
+            <i class="fas fa-edit"></i> Edit Mode
+          </button>
+          <button class="btn-primary" onclick="window.location.href='admin-add-staff.html'">
+            <i class="fas fa-plus"></i> Add Staff
+          </button>
+        </div>
+      </div>
+
+      <table id="staffTable">
+        <thead>
+          <tr>
+            <th>Staff ID</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th class="editable-col">Department</th>
+            <th class="editable-col">Zone</th>
+            <th>Assigned Complaints</th>
+            <th class="editable-col">Status</th>
+            <th>Contact</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<script src="admin-staff.js"></script>
+</body>
+</html>

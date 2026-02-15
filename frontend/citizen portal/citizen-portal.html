@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citizen Portal | Smart City Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../admin panel/admin-shared.css">
+  <link rel="stylesheet" href="citizen-portal.css">
+</head>
+<body>
+
+<header class="global-header">
+  <div class="header-left">
+    <button class="menu-btn"><i class="fas fa-bars"></i></button>
+    <a href="#" class="logo-text">Smart<span>City</span></a>
+  </div>
+  <div class="header-right">
+    <span class="page-title">Dashboard</span>
+    <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <a href="citizen-portal.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="citizen-complaint.html"><i class="fas fa-plus-circle"></i> New Complaint</a>
+    <a href="my-complaints.html"><i class="fas fa-list"></i> My Complaints</a>
+    <a href="track-status.html"><i class="fas fa-search"></i> Track Status</a>
+    <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+  </aside>
+
+  <main class="main citizen-main">
+    <section class="welcome-section">
+      <div class="welcome-content">
+        <h1>Your City. Your Voice.</h1>
+        <p>Report issues, track progress, and contribute to a smarter, more transparent city.</p>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">Total Complaints</div>
+          <div class="stat-number" id="totalCount">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon pending"><i class="fas fa-clock"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">Pending</div>
+          <div class="stat-number" id="pendingCount">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon progress"><i class="fas fa-cog"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">In Progress</div>
+          <div class="stat-number" id="progressCount">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon resolved"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">Resolved</div>
+          <div class="stat-number" id="resolvedCount">0</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quick-actions">
+      <a href="citizen-complaint.html" class="action-card">
+        <div class="action-icon"><i class="fas fa-plus"></i></div>
+        <div class="action-content">
+          <h3>Submit New Complaint</h3>
+          <p>Report road, water, electricity or waste issues</p>
+        </div>
+        <div class="action-arrow"><i class="fas fa-arrow-right"></i></div>
+      </a>
+
+      <a href="my-complaints.html" class="action-card">
+        <div class="action-icon"><i class="fas fa-list-check"></i></div>
+        <div class="action-content">
+          <h3>View My Complaints</h3>
+          <p>Check status and updates of your complaints</p>
+        </div>
+        <div class="action-arrow"><i class="fas fa-arrow-right"></i></div>
+      </a>
+
+      <a href="track-status.html" class="action-card">
+        <div class="action-icon"><i class="fas fa-map-location-dot"></i></div>
+        <div class="action-content">
+          <h3>Track Status</h3>
+          <p>View real-time progress on complaints</p>
+        </div>
+        <div class="action-arrow"><i class="fas fa-arrow-right"></i></div>
+      </a>
+    </section>
+
+    <section class="recent-complaints">
+      <div class="section-header">
+        <h2>Recent Complaints</h2>
+        <a href="my-complaints.html" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <div id="recentComplaintsContainer" class="complaints-table-wrapper">
+        <div class="loading">Loading recent complaints...</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="citizen-common.js"></script>
+<script src="citizen-portal.js"></script>
+</body>
+</html>

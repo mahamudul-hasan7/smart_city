@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Control | SmartCity</title>
+  <link rel="stylesheet" href="admin-login.css">
+</head>
+<body>
+
+<!-- Background -->
+<div class="admin-bg"></div>
+
+<!-- Header -->
+<header class="admin-header">
+  <a href="../index/index.html" class="logo">
+    Smart<span>City</span>
+  </a>
+  <span class="system">Internal Administration</span>
+</header>
+
+<!-- Main -->
+<main class="admin-shell">
+
+  <!-- Left: Authority Context -->
+  <section class="authority">
+    <h1>System<br>Control Panel</h1>
+    <p>
+      Restricted access for authorized administrators.  
+      All activities are logged and monitored for security.
+    </p>
+
+    <ul>
+      <li>System-wide complaint oversight</li>
+      <li>Department & staff control</li>
+      <li>Performance analytics</li>
+      <li>Audit & reporting tools</li>
+    </ul>
+  </section>
+
+  <!-- Right: Login Box -->
+  <section class="login-box">
+
+    <div class="login-card">
+      <h2>Administrator Login</h2>
+      <span class="note">Secure verification required</span>
+
+      <form id="adminForm" novalidate>
+
+        <div class="field">
+          <label>Admin ID</label>
+          <input type="text" id="adminId" required>
+          <small></small>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="adminPass" required>
+          <small></small>
+        </div>
+
+        <button type="submit">
+          Verify & Enter
+        </button>
+
+      </form>
+
+      <div class="warning">
+        Unauthorized access is strictly prohibited.
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<script src="admin-login.js"></script>
+</body>
+</html>

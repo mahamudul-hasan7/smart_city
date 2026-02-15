@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Complaints | SmartCity</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../admin panel/admin-shared.css">
+  <link rel="stylesheet" href="citizen-portal.css">
+  <link rel="stylesheet" href="my-complaints.css">
+</head>
+<body>
+  <header class="global-header">
+    <div class="header-left">
+      <button class="menu-btn"><i class="fas fa-bars"></i></button>
+      <a href="#" class="logo-text">Smart<span>City</span></a>
+    </div>
+    <div class="header-right">
+      <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="citizen-portal.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="citizen-complaint.html"><i class="fas fa-plus-circle"></i> New Complaint</a>
+      <a href="my-complaints.html" class="active"><i class="fas fa-list"></i> My Complaints</a>
+      <a href="track-status.html"><i class="fas fa-search"></i> Track Status</a>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+    </aside>
+
+    <main class="main citizen-main">
+      <!-- Search and Filters -->
+      <div class="complaints-controls">
+        <div class="search-container">
+          <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Search by ID, title, or category" 
+            onkeyup="filterComplaints()"
+          >
+          <i class="fas fa-search"></i>
+        </div>
+        <div class="filter-group">
+          <select id="statusFilter" class="filter-select" onchange="filterComplaints()">
+            <option value="">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+          <select id="categoryFilter" class="filter-select" onchange="filterComplaints()">
+            <option value="">All Categories</option>
+            <option value="Road">Road</option>
+            <option value="Water">Water</option>
+            <option value="Waste">Waste</option>
+            <option value="Electricity">Electricity</option>
+            <option value="Other">Other</option>
+          </select>
+          <button class="reset-btn" onclick="resetFilters()">
+            <i class="fas fa-redo"></i> RESET
+          </button>
+        </div>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-clock"></i></div>
+          <div class="stat-content">
+            <div class="stat-number" id="pendingCount">0</div>
+            <div class="stat-label">PENDING</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-spinner"></i></div>
+          <div class="stat-content">
+            <div class="stat-number" id="progressCount">0</div>
+            <div class="stat-label">IN PROGRESS</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="stat-content">
+            <div class="stat-number" id="resolvedCount">0</div>
+            <div class="stat-label">RESOLVED</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+          <div class="stat-content">
+            <div class="stat-number" id="rejectedCount">0</div>
+            <div class="stat-label">REJECTED</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- View Toggle -->
+      <div class="view-toggle">
+        <button class="view-btn active" data-view="grid" onclick="toggleView('grid')">
+          <i class="fas fa-th"></i> Grid View
+        </button>
+        <button class="view-btn" data-view="list" onclick="toggleView('list')">
+          <i class="fas fa-list"></i> List View
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">No Complaints Yet</div>
+        <div class="empty-text">You haven't submitted any complaints yet.</div>
+        <a href="citizen-complaint.html" class="btn btn-primary">
+          <i class="fas fa-plus"></i> Submit Your First Complaint
+        </a>
+      </div>
+
+      <!-- Complaints Container -->
+      <div id="complaintsList" class="complaints-container grid-view"></div>
+    </main>
+  </div>
+
+  <script src="citizen-common.js"></script>
+  <script src="my-complaints.js"></script>
+</body>
+</html>

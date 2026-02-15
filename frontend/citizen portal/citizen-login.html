@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Citizen Access | Smart City Platform</title>
+  <link rel="stylesheet" href="citizen-login.css">
+</head>
+<body>
+
+<!-- SAME BACKGROUND AS INDEX / SIGNUP -->
+<div class="hero-bg"></div>
+
+<!-- BACK BUTTON -->
+<a href="../index/index.html" class="back-btn">
+  ← Back to Home
+</a>
+
+<!-- navbar -->
+<header class="nav-glass">
+  <a href="../index/index.html" class="logo">
+    Smart<span>City</span>
+  </a>
+</header>
+
+<div class="shell">
+
+  <!-- LEFT: BRAND / CONTEXT -->
+  <section class="context">
+    <span class="badge">Smart City Platform</span>
+    <h1>Your city.<br>Your identity.</h1>
+    <p>
+      Securely access city services, submit complaints,  
+      and track resolutions in real time.
+    </p>
+
+    <div class="highlights">
+      <div>✓ Unified citizen account</div>
+      <div>✓ Transparent service tracking</div>
+      <div>✓ Data-driven city governance</div>
+    </div>
+  </section>
+
+  <!-- RIGHT: LOGIN -->
+  <section class="auth">
+
+    <div class="auth-card">
+
+      <header>
+        <h2>Citizen Sign In</h2>
+        <span>Verified residents only</span>
+      </header>
+
+      <form id="citizenForm" novalidate>
+
+        <div class="field">
+          <input type="email" id="email" required autocomplete="off">
+          <label>Email address</label>
+          <em></em>
+        </div>
+
+        <div class="field">
+          <input type="password" id="password" required>
+          <label>Password</label>
+          <button type="button" class="password-toggle" id="passwordToggle" title="Toggle password visibility">
+            <i class="fas fa-eye"></i>
+          </button>
+          <em></em>
+        </div>
+
+        <button type="submit">
+          Next <span>→</span>
+        </button>
+
+        <a href="#" class="forgot-password-link" onclick="handleForgotPassword(event)">Forgot your password?</a>
+
+      </form>
+
+      <footer>
+        <span>Need access? Registration handled by city authority.</span>
+      </footer>
+
+    </div>
+
+  </section>
+
+</div>
+
+<!-- LOGIN SUCCESS MODAL -->
+<div id="loginSuccessModal" class="login-success-modal">
+  <div class="success-backdrop"></div>
+  <div class="success-content">
+    <div class="success-icon-wrapper">
+      <div class="success-ring"></div>
+      <div class="success-ring ring-2"></div>
+      <div class="check-icon">
+        <svg viewBox="0 0 52 52" class="checkmark">
+          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+      </div>
+    </div>
+    <h2>Login Successful</h2>
+    <p id="welcomeName">Welcome back!</p>
+    
+    <div class="loading-section">
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+        <div class="progress-glow"></div>
+      </div>
+      <div class="loading-text">Preparing your dashboard...</div>
+    </div>
+    
+    <div class="access-info">
+      <div class="info-item">
+        <span class="info-icon">🏙️</span>
+        <span>Smart City Services</span>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">✓</span>
+        <span>Secure Access</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="citizen-login.js"></script>
+</body>
+</html>

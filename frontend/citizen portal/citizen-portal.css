@@ -1,0 +1,432 @@
+/* ===================================================================
+   CITIZEN PORTAL - CUSTOM OVERRIDES & EXTENSIONS
+   Based on admin-shared.css, with citizen-specific styles
+   =================================================================== */
+
+/* Override body padding to account for fixed header */
+body {
+  padding-top: var(--header-height);
+}
+
+/* ===================================================================
+   CITIZEN-SPECIFIC MAIN CONTENT
+   =================================================================== */
+
+.main.citizen-main {
+  margin-left: var(--sidebar-width);
+  padding: var(--padding-large);
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Page layout adjustment */
+.layout {
+  position: relative;
+  display: flex;
+  min-height: calc(100vh - var(--header-height));
+}
+
+.layout.collapsed .sidebar {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.layout.collapsed .main.citizen-main {
+  margin-left: 0;
+}
+
+/* ===================================================================
+   WELCOME SECTION
+   =================================================================== */
+
+.welcome-section {
+  margin-bottom: 50px;
+}
+
+.welcome-content h1 {
+  font-size: 42px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #00d4ff, #00ff88);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px;
+}
+
+.welcome-content p {
+  font-size: 16px;
+  color: #aaa;
+  max-width: 600px;
+}
+
+/* ===================================================================
+   STATISTICS SECTION
+   =================================================================== */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 50px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, rgba(20, 30, 60, 0.6), rgba(10, 20, 45, 0.6));
+  border: 2px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  border-color: #00d4ff;
+  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.15);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  color: #00d4ff;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 212, 255, 0.1);
+  border-radius: 50%;
+}
+
+.stat-icon.pending {
+  color: #ffaa00;
+  background: rgba(255, 170, 0, 0.1);
+}
+
+.stat-icon.progress {
+  color: #0088cc;
+  background: rgba(0, 136, 204, 0.1);
+}
+
+.stat-icon.resolved {
+  color: #00ff88;
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: #00d4ff;
+}
+
+/* ===================================================================
+   QUICK ACTIONS
+   =================================================================== */
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 50px;
+}
+
+.action-card {
+  background: linear-gradient(135deg, rgba(20, 30, 60, 0.6), rgba(10, 20, 45, 0.6));
+  border: 2px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.action-card:hover {
+  transform: translateY(-5px);
+  border-color: #00d4ff;
+  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.15);
+}
+
+.action-icon {
+  font-size: 2rem;
+  color: #00d4ff;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 212, 255, 0.1);
+  border-radius: 10px;
+}
+
+.action-content {
+  flex: 1;
+}
+
+.action-content h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.action-content p {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.action-arrow {
+  font-size: 1.5rem;
+  color: #00d4ff;
+  opacity: 0.6;
+  transition: all 0.3s;
+}
+
+.action-card:hover .action-arrow {
+  opacity: 1;
+  transform: translateX(5px);
+}
+
+/* ===================================================================
+   RECENT COMPLAINTS SECTION
+   =================================================================== */
+
+.recent-complaints {
+  margin-bottom: 40px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #00d4ff, #00ff88);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.view-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #00d4ff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.view-all:hover {
+  gap: 12px;
+}
+
+.complaints-table-wrapper {
+  background: linear-gradient(135deg, rgba(20, 30, 60, 0.6), rgba(10, 20, 45, 0.6));
+  border: 2px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.complaints-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.complaints-table thead tr {
+  background: rgba(0, 212, 255, 0.05);
+  border-bottom: 2px solid rgba(0, 212, 255, 0.2);
+}
+
+.complaints-table th {
+  padding: 15px 20px;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #00d4ff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.complaints-table td {
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+  color: #ccc;
+}
+
+.complaints-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.complaints-table tbody tr:hover {
+  background: rgba(0, 212, 255, 0.05);
+}
+
+.complaint-id {
+  font-weight: 500;
+  color: #00d4ff;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background: rgba(255, 170, 0, 0.2);
+  color: #ffaa00;
+}
+
+.status-in-progress {
+  background: rgba(0, 136, 204, 0.2);
+  color: #0088cc;
+}
+
+.status-resolved {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: #aaa;
+}
+
+.empty-state {
+  padding: 40px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  color: #666;
+}
+
+.empty-title {
+  font-size: 1.1rem;
+  color: #aaa;
+  margin-bottom: 10px;
+}
+
+.empty-text {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* ===================================================================
+   RESPONSIVE DESIGN
+   =================================================================== */
+
+@media (max-width: 1024px) {
+  .main.citizen-main {
+    padding: 30px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main.citizen-main {
+    padding: 20px;
+  }
+
+  .welcome-content h1 {
+    font-size: 28px;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .action-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .action-arrow {
+    display: none;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .complaints-table th,
+  .complaints-table td {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main.citizen-main {
+    padding: 15px;
+  }
+
+  .welcome-content h1 {
+    font-size: 20px;
+  }
+
+  .welcome-content p {
+    font-size: 14px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .action-card {
+    padding: 20px;
+  }
+}

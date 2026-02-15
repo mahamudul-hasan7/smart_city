@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Reports - SmartCity Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="live-reports.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- Glass AI Chat Button -->
+<button id="chat-btn">
+  💭
+  <span id="chat-badge" class="badge" style="display:none;">0</span>
+</button>
+
+<!-- Glass Chat Box -->
+<div id="chat-box">
+  <div class="chat-header">
+    <div class="bot-info">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" />
+      <div>
+        <strong>AI Assistant</strong>
+        <span class="online-dot">● Online</span>
+      </div>
+    </div>
+    <div class="chat-actions">
+      <button id="chat-min" title="Minimize">−</button>
+      <button id="chat-close" title="Close">×</button>
+    </div>
+  </div>
+
+  <div class="chat-body" id="chat-body">
+    <div class="bot-msg">
+      👋 Hello Sir, How can I help you?
+    </div>
+    <div id="typing" class="typing hidden"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+  </div>
+
+  <div class="chat-quick">
+    <button class="chip" data-text="How to track complaint?">Track status</button>
+    <button class="chip" data-text="How to submit complaint?">Submit complaint</button>
+    <button class="chip" data-text="Contact support">Contact support</button>
+  </div>
+
+  <div class="chat-input">
+    <input type="text" id="user-input" placeholder="Message" />
+    <button onclick="sendMessage()">➤</button>
+  </div>
+</div>
+
+<!-- GLOBAL HEADER -->
+<header class="global-header" id="header">
+  <a href="../index/index.html" class="logo">
+    Smart<span>City</span>
+  </a>
+
+  <nav>
+    <a href="../signup/signup.html" class="btn signup-btn">
+      Sign Up</a>
+    <a href="../citizen portal/citizen-login.html">Citizen</a>
+    <a href="../admin panel/admin-login.html">Admin</a>
+  </nav>
+</header>
+
+<!-- LIVE REPORTS SECTION -->
+<section class="analytics" style="margin-top: 100px;">
+
+  <div class="overview-buttons">
+    <button class="btn demo-btn" data-mode="demo">Demo</button>
+    <button class="btn demo-btn active" data-mode="live">Live</button>
+  </div>
+
+  <div class="live-indicator">● LIVE</div>
+  <h2>🎯 Real-Time Complaint Analytics</h2>
+  <p class="sub">
+    Live dashboard showing real-time complaint trends and city operations
+  </p>
+
+</section>
+
+<!-- ===================== -->
+<!-- KEY METRICS / STATS -->
+<!-- ===================== -->
+<section class="analytics">
+
+  <h2 style="font-size: 20px; margin-bottom: 16px;">📊 Key Metrics</h2>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-box">
+      <span>Total Complaints</span>
+      <strong id="totalCount">-</strong>
+    </div>
+    <div class="stat-box pending">
+      <span>Pending</span>
+      <strong id="pendingCount">-</strong>
+    </div>
+    <div class="stat-box resolved">
+      <span>Resolved</span>
+      <strong id="resolvedCount">-</strong>
+    </div>
+    <div class="stat-box rejected">
+      <span>Rejected</span>
+      <strong id="rejectedCount">-</strong>
+    </div>
+  </div>
+
+</section>
+
+<!-- ===================== -->
+<!-- TREND ANALYSIS -->
+<!-- ===================== -->
+<section class="analytics">
+
+  <h2 style="font-size: 20px; margin-bottom: 24px;">📊 Trend Analysis</h2>
+
+  <div class="charts">
+
+    <div class="chart-card">
+      <h3>📈 Weekly Complaint Status</h3>
+      <canvas id="weeklyLineChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>📉 Monthly Resolution Rate</h3>
+      <canvas id="monthlyLineChart"></canvas>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ===================== -->
+<!-- COMPLAINT ANALYSIS -->
+<!-- ===================== -->
+<section class="analytics">
+
+  <h2 style="font-size: 20px; margin-bottom: 24px;">🔍 Complaint Analysis</h2>
+
+  <div class="charts">
+
+    <div class="chart-card">
+      <h3>Status Distribution</h3>
+      <canvas id="statusChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Area-wise Reports</h3>
+      <canvas id="areaChart"></canvas>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ===================== -->
+<!-- PERFORMANCE SECTION -->
+<!-- ===================== -->
+<section class="analytics">
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+
+    <!-- Department Performance -->
+    <div>
+      <h2 style="font-size: 20px; margin-bottom: 16px;">🏢 Department Performance</h2>
+      <p class="sub" style="margin-bottom: 20px;">Resolution efficiency by department</p>
+
+      <div id="departmentList"></div>
+    </div>
+
+    <!-- Smart City Impact -->
+    <div>
+      <h2 style="font-size: 20px; margin-bottom: 16px;">⚡ Performance Metrics</h2>
+      <p class="sub" style="margin-bottom: 20px;">Real-time city performance metrics</p>
+
+      <div class="impact-grid">
+        <div class="impact-card reveal">
+          <strong class="counter" id="resolvedTodayCount">0</strong>
+          <span>Resolved Today</span>
+        </div>
+
+        <div class="impact-card reveal">
+          <strong class="counter" id="avgTimeHoursCount">0</strong>
+          <span>Avg Time (hrs)</span>
+        </div>
+
+        <div class="impact-card reveal">
+          <strong class="counter" id="fieldOfficersCount">0</strong>
+          <span>Field Officers</span>
+        </div>
+
+        <div class="impact-card reveal">
+          <strong class="counter" id="areasCoveredCount">0</strong>
+          <span>Areas Covered</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ===================== -->
+<!-- LIVE COMPLAINTS FEED -->
+<!-- ===================== -->
+<section class="analytics">
+
+  <h2 style="font-size: 20px; margin-bottom: 16px;">🔴 Live Complaint Feed</h2>
+  <p class="sub">Latest issues reported across the city in real-time</p>
+
+  <div class="chart-card live-card premium-live">
+    <div class="live-overlay"></div>
+    <div class="live-content">
+      <ul class="live-list"></ul>
+    </div>
+  </div>
+
+</section>
+
+<!-- ===================== -->
+<!-- REAL-TIME MAP -->
+<!-- ===================== -->
+<section class="analytics">
+
+  <h2 style="font-size: 20px; margin-bottom: 16px;">🗺️ Real-Time Complaint Map</h2>
+  <p class="sub">Live tracking of complaint locations across the city</p>
+
+  <div class="map-container">
+    <div id="live-map"></div>
+    <div class="map-scroll-overlay">
+      <span>🖱️ Click to interact with map</span>
+    </div>
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="footer reveal" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(56, 189, 248, 0.03)); border-top: 1px solid rgba(56, 189, 248, 0.15); margin-top: 60px; padding: 30px 20px; text-align: center; color: rgba(255,255,255,0.7);">
+  <div class="container">
+    <p style="margin: 0; font-size: 13px;">© 2026 SmartCity Platform | Real-Time Complaint Management System</p>
+    <p style="margin: 8px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.5);">Empowering cities with transparent digital infrastructure</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="live-reports.js"></script>
+<script>
+  // Chat functionality
+  const chatBtn = document.getElementById('chat-btn');
+  const chatBox = document.getElementById('chat-box');
+  const chatMin = document.getElementById('chat-min');
+  const chatClose = document.getElementById('chat-close');
+  const chips = document.querySelectorAll('.chip');
+
+  chatBtn.addEventListener('click', () => {
+    chatBox.classList.toggle('show');
+  });
+
+  chatMin.addEventListener('click', () => {
+    chatBox.classList.remove('show');
+  });
+
+  chatClose.addEventListener('click', () => {
+    chatBox.classList.remove('show');
+  });
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', function() {
+      const msg = this.dataset.text;
+      const input = document.getElementById('user-input');
+      input.value = msg;
+      sendMessage();
+    });
+  });
+
+  function sendMessage() {
+    const input = document.getElementById('user-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    const chatBody = document.getElementById('chat-body');
+    const userMsgDiv = document.createElement('div');
+    userMsgDiv.className = 'user-msg';
+    userMsgDiv.textContent = msg;
+    chatBody.appendChild(userMsgDiv);
+
+    input.value = '';
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    const typing = document.getElementById('typing');
+    typing.classList.remove('hidden');
+
+    setTimeout(() => {
+      typing.classList.add('hidden');
+      const botMsgDiv = document.createElement('div');
+      botMsgDiv.className = 'bot-msg';
+      botMsgDiv.textContent = 'Thank you for your message. Our team will assist you shortly!';
+      chatBody.appendChild(botMsgDiv);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }, 1000);
+  }
+</script>
+
+</body>
+</html>

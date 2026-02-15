@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Citizen Registration | Smart City Platform</title>
+  <link rel="stylesheet" href="signup.css">
+</head>
+<body>
+
+<!-- SAME BACKGROUND AS INDEX -->
+<div class="hero-bg"></div>
+
+<!-- BACK BUTTON -->
+<a href="../index/index.html" class="back-btn">
+  ← Back to Home
+</a>
+
+<div class="shell">
+
+  <!-- LEFT CONTEXT -->
+  <section class="context">
+    <span class="badge">Smart City Platform</span>
+    <h1>Become a<br>Responsible Citizen</h1>
+    <p>
+      Create your citizen identity to report issues,  
+      track progress, and contribute to a smarter city.
+    </p>
+
+    <ul>
+      <li>✔ Secure citizen identity</li>
+      <li>✔ Transparent complaint tracking</li>
+      <li>✔ Direct connection with city authorities</li>
+    </ul>
+  </section>
+
+  <!-- RIGHT FORM -->
+  <section class="form-zone">
+
+    <div class="form-card">
+      <h2>Citizen Sign Up</h2>
+      <p class="sub">Register to access city services</p>
+
+      <form id="signupForm" novalidate>
+
+        <div class="grid">
+          <div class="field">
+            <input type="text" id="name" required>
+            <label>Full Name</label>
+            <small></small>
+          </div>
+
+          <div class="field">
+            <input type="date" id="dob" required>
+            <label>Date of Birth</label>
+            <small></small>
+          </div>
+        </div>
+
+        <div class="field">
+          <input type="text" id="nid" required>
+          <label>National ID</label>
+          <small></small>
+        </div>
+
+        <div class="field">
+          <input type="email" id="email" required>
+          <label>Email Address</label>
+          <small></small>
+        </div>
+
+        <div class="field">
+          <input type="password" id="password" required>
+          <label>Password</label>
+          <small></small>
+        </div>
+
+        <div class="field">
+          <input type="password" id="confirm" required>
+          <label>Confirm Password</label>
+          <small></small>
+        </div>
+
+        <button type="submit">Create Account →</button>
+      </form>
+
+      <div class="footer">
+        Already registered?
+        <a href="../citizen portal/citizen-login.html">Login here</a>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<!-- SUCCESS MODAL -->
+<div id="successModal" class="success-modal">
+  <div class="success-backdrop"></div>
+  <div class="success-content">
+    <div class="success-icon">
+      <div class="icon-glow"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    <h2>Welcome Aboard!</h2>
+    <p>Your account has been created successfully</p>
+    <div class="success-stats">
+      <div class="stat-item">
+        <span class="stat-number">✓</span>
+        <span class="stat-label">Account Created</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">✓</span>
+        <span class="stat-label">Auto-Logged In</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">✓</span>
+        <span class="stat-label">Ready to Go</span>
+      </div>
+    </div>
+    <div class="success-subtext">Redirecting to your dashboard...</div>
+    <div class="loader-container">
+      <div class="loader"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFETTI CANVAS -->
+<canvas id="confetti"></canvas>
+
+<script src="signup.js"></script>
+</body>
+</html>

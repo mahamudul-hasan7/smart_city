@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Complaints | SmartCity Admin</title>
+  <link rel="stylesheet" href="admin-shared.css">
+  <link rel="stylesheet" href="all-complaints.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- GLOBAL HEADER -->
+<header class="global-header">
+  <div class="header-left">
+    <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+    <a href="../index/index.html" class="logo-text">Smart<span>City</span></a>
+  </div>
+
+  <div class="header-right">
+    <span class="page-title">All Complaints</span>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout" id="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="admin-dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="admin-assign.html"><i class="fas fa-tasks"></i> Assign</a>
+    <a class="active"><i class="fas fa-list"></i> All Complaints</a>
+    <a href="admin-departments.html"><i class="fas fa-building"></i> Departments</a>
+    <a href="admin-staff.html"><i class="fas fa-users"></i> Staff</a>
+    <a href="admin-zones.html"><i class="fas fa-map-marker-alt"></i> Zones</a>
+    <a href="admin-reports.html"><i class="fas fa-file-alt"></i> Reports</a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- PAGE HEADER WITH STAT -->
+    <section class="page-header-container">
+      <div class="page-header">
+        <h1 class="page-title-main">All Complaints</h1>
+        <p class="page-subtitle">Complete list of complaints submitted by citizens</p>
+      </div>
+
+      <div class="complaint-stat-card">
+        <div class="complaint-stat-icon">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="complaint-stat-content">
+          <span class="complaint-stat-label">Total Complaints</span>
+          <span class="complaint-stat-value" id="totalComplaints">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER BAR -->
+    <section class="filters">
+      <input type="text" id="searchInput" placeholder="Search by ID / Name / Zone...">
+      <select id="statusFilter">
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="in-progress">In Progress</option>
+        <option value="resolved">Resolved</option>
+      </select>
+      <button class="btn-search"><i class="fas fa-search"></i> Search</button>
+      <button class="btn-reset"><i class="fas fa-redo"></i> Reset</button>
+      <button class="btn-edit-mode" id="editModeToggle">
+        <i class="fas fa-edit"></i> <span id="editModeText">Enable Edit Mode</span>
+      </button>
+    </section>
+
+    <!-- TABLE -->
+    <section class="table-box">
+      <table>
+        <thead>
+          <tr>
+            <th>Complaint ID</th>
+            <th>User ID</th>
+            <th>Zone</th>
+            <th>Status</th>
+            <th>Description</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>SC-1012</td>
+            <td>U-201</td>
+            <td>Rahim Uddin</td>
+            <td>Mirpur</td>
+            <td class="pending">Pending</td>
+            <td>Road damaged near main street</td>
+            <td>2026-01-15</td>
+          </tr>
+
+          <tr>
+            <td>SC-1013</td>
+            <td>U-204</td>
+            <td>Karim Khan</td>
+            <td>Dhanmondi</td>
+            <td class="progress">In Progress</td>
+            <td>Water leakage in apartment area</td>
+            <td>2026-01-14</td>
+          </tr>
+
+          <tr>
+            <td>SC-1014</td>
+            <td>U-210</td>
+            <td>Nusrat Jahan</td>
+            <td>Uttara</td>
+            <td class="resolved">Resolved</td>
+            <td>Garbage not collected</td>
+            <td>2026-01-13</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Actions column handles updates; resolved rows are locked. -->
+
+  </main>
+</div>
+
+<script src="all-complaints.js"></script>
+</body>
+</html>

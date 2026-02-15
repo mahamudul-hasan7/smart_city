@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile | SmartCity</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../admin panel/admin-shared.css">
+  <link rel="stylesheet" href="citizen-portal.css">
+  <style>
+    /* Notification Styles */
+    .notification {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      padding: 16px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateX(400px);
+      transition: all 0.3s ease;
+      z-index: 10000;
+      max-width: 300px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background: rgba(0, 255, 136, 0.2);
+      border: 1px solid var(--success-color);
+      color: var(--success-color);
+    }
+
+    .notification.error {
+      background: rgba(255, 50, 50, 0.2);
+      border: 1px solid #ff3232;
+      color: #ff3232;
+    }
+
+    /* Overlay/Modal */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5000;
+      backdrop-filter: blur(4px);
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .overlay-content {
+      text-align: center;
+      color: var(--text-primary);
+      font-size: 18px;
+      font-weight: 600;
+    }
+  </style>
+  <style>
+    .profile-container {
+      max-width: 900px;
+    }
+
+    .profile-section {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .profile-section:hover {
+      border-color: rgba(0, 212, 255, 0.25);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-section h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .profile-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile-field label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .profile-field input,
+    .profile-field textarea {
+      font-size: 14px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 8px;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .profile-field select {
+      font-size: 14px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 8px;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .profile-field input:focus,
+    .profile-field textarea:focus,
+    .profile-field select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background: rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+    }
+
+    .profile-field input:disabled,
+    .profile-field select:disabled {
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-secondary);
+      cursor: not-allowed;
+    }
+
+    .avatar-section {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 20px;
+    }
+
+    .user-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--success-color) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--bg-primary);
+      border: 3px solid rgba(0, 212, 255, 0.3);
+      flex-shrink: 0;
+    }
+
+    .user-info h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+
+    .user-info p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin: 5px 0;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success-color);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    .btn-save {
+      padding: 10px 24px;
+      background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+      border: none;
+      border-radius: 8px;
+      color: var(--bg-primary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3);
+    }
+
+    .btn-cancel {
+      padding: 10px 24px;
+      background: transparent;
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-cancel:hover {
+      border-color: var(--primary-color);
+      background: rgba(0, 212, 255, 0.1);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .stat-box {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+    }
+
+    /* Password Change Section */
+    .change-password-section {
+      background: rgba(255, 100, 50, 0.1);
+      border: 1px solid rgba(255, 100, 50, 0.2);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .password-field {
+      margin-bottom: 15px;
+    }
+
+    .password-field input {
+      width: 100%;
+    }
+
+    .password-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    /* Completeness Score */
+    .completeness-section {
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(0, 212, 255, 0.05);
+      border-radius: 8px;
+    }
+
+    .completeness-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .completeness-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .completeness-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .completeness-score {
+      font-size: 14px;
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    /* Achievement Badges */
+    .badges-container {
+      margin-top: 20px;
+    }
+
+    .level-progress {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    .level-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .current-level {
+      color: var(--primary-color);
+    }
+
+    .max-level {
+      color: var(--text-secondary);
+    }
+
+    .progress-bar-badges {
+      width: 100%;
+      height: 6px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .progress-fill-badges {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .level-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 10px;
+    }
+
+    .badges-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .badge-item {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      position: relative;
+      transition: all 0.3s ease;
+      opacity: 0.4;
+      filter: grayscale(100%);
+    }
+
+    .badge-item.earned {
+      background: rgba(0, 212, 255, 0.1);
+      border-color: rgba(0, 212, 255, 0.3);
+      opacity: 1;
+      filter: grayscale(0%);
+    }
+
+    .badge-item.earned:hover {
+      background: rgba(0, 212, 255, 0.15);
+      transform: translateY(-5px);
+    }
+
+    .badge-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .badge-check {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: var(--success-color);
+      color: var(--bg-primary);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .badge-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .badge-level {
+      font-size: 10px;
+      color: var(--primary-color);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* Community Impact Section */
+    .impact-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 30px;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .impact-circle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin: 0 auto;
+    }
+
+    .impact-ring {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    circle {
+      fill: none;
+    }
+
+    circle:nth-of-type(1) {
+      stroke: rgba(0, 212, 255, 0.1);
+      stroke-width: 8;
+    }
+
+    circle:nth-of-type(2) {
+      stroke: url(#gradientStroke);
+      stroke-width: 8;
+      stroke-dasharray: 282;
+      stroke-dashoffset: 282;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.6s ease;
+    }
+
+    .impact-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .impact-number {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .impact-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .impact-stats {
+      display: grid;
+      gap: 20px;
+    }
+
+    .impact-stat {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+    }
+
+    .impact-stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .impact-stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* Recent Complaints Section */
+    .complaints-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .complaint-item {
+      background: rgba(0, 0, 0, 0.2);
+      border-left: 3px solid var(--primary-color);
+      border-radius: 4px;
+      padding: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .complaint-item:hover {
+      background: rgba(0, 0, 0, 0.3);
+      transform: translateX(5px);
+    }
+
+    .complaint-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .complaint-item-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .complaint-status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .complaint-status.pending {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+    }
+
+    .complaint-status.in {
+      background: rgba(33, 150, 243, 0.2);
+      color: #2196f3;
+    }
+
+    .complaint-status.progress {
+      background: rgba(33, 150, 243, 0.2);
+      color: #2196f3;
+    }
+
+    .complaint-status.resolved {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success-color);
+    }
+
+    .complaint-status.rejected {
+      background: rgba(255, 50, 50, 0.2);
+      color: #ff3232;
+    }
+
+    /* Login History */
+    .history-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .history-item {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      padding: 12px;
+      border-left: 3px solid var(--success-color);
+    }
+
+    .history-time {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .history-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Danger Zone */
+    .danger-zone {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(255, 50, 50, 0.05);
+      border: 1px solid rgba(255, 50, 50, 0.2);
+      border-radius: 8px;
+    }
+
+    .danger-zone h3 {
+      color: #ff3232;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .danger-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-danger {
+      padding: 10px 16px;
+      background: rgba(255, 50, 50, 0.2);
+      border: 1px solid #ff3232;
+      border-radius: 6px;
+      color: #ff3232;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 13px;
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 50, 50, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      padding: 10px 16px;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 13px;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 212, 255, 0.15);
+      border-color: var(--primary-color);
+    }
+
+    .last-login-badge {
+      display: inline-block;
+      padding: 8px 12px;
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--success-color);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    /* View Mode Styles */
+    .view-mode-toggle {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 8px;
+    }
+
+    .view-mode-toggle label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .view-mode-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--primary-color);
+    }
+
+    .view-mode-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(0, 212, 255, 0.2);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--primary-color);
+      margin-left: auto;
+    }
+
+    .view-mode-badge.view {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--success-color);
+    }
+
+    .view-mode-badge.edit {
+      background: rgba(255, 193, 7, 0.15);
+      color: #ffc107;
+    }
+
+    /* Field display styles */
+    .profile-field-display {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile-field-display label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .profile-field-display-value {
+      font-size: 14px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      color: var(--text-primary);
+      border: 1px solid transparent;
+    }
+
+    .profile-field-display-value:empty::before {
+      content: "—";
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .profile-section {
+        padding: 20px;
+      }
+
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .avatar-section {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .btn-save,
+      .btn-cancel {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .badges-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+
+      .impact-container {
+        grid-template-columns: 1fr;
+      }
+
+      .danger-buttons {
+        flex-direction: column;
+      }
+
+      .btn-danger,
+      .btn-secondary {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Notifications Container -->
+<div id="notificationsContainer"></div>
+<div id="overlay" class="overlay">
+  <div class="overlay-content">Loading...</div>
+</div>
+
+<header class="global-header">
+  <div class="header-left">
+    <button class="menu-btn"><i class="fas fa-bars"></i></button>
+    <a href="#" class="logo-text">Smart<span>City</span></a>
+  </div>
+  <div class="header-right">
+    <span class="page-title">Profile</span>
+    <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <a href="citizen-portal.html"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="citizen-complaint.html"><i class="fas fa-plus-circle"></i> New Complaint</a>
+    <a href="my-complaints.html"><i class="fas fa-list"></i> My Complaints</a>
+    <a href="track-status.html"><i class="fas fa-search"></i> Track Status</a>
+    <a href="profile.html" class="active"><i class="fas fa-user"></i> Profile</a>
+  </aside>
+
+  <main class="main citizen-main">
+    <div class="profile-container">
+      
+      <!-- User Header Section -->
+      <div class="profile-section">
+        <div class="avatar-section">
+          <div class="user-avatar" id="userAvatarDisplay" style="position: relative;">
+            R
+            <span style="position: absolute; bottom: -2px; right: -2px; background: #10b981; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2px solid white;"><i class="fas fa-check"></i></span>
+          </div>
+          <div class="user-info">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h1 id="displayName" style="margin: 0;">Loading...</h1>
+              <span id="verifiedBadge" style="display: none; color: #00d4ff; font-size: 18px; white-space: nowrap;"><i class="fas fa-check-circle"></i></span>
+            </div>
+            <p id="lastLoginDisplay" style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">Last login: -</p>
+            
+            <!-- Profile Completeness -->
+            <div style="margin-top: 18px;">
+              <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; font-weight: 600;">Profile Completeness</div>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <div style="width: 280px; height: 16px; background: rgba(0,0,0,0.3); border-radius: 8px; overflow: hidden;">
+                  <div id="completenessBarHeader" style="height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--success-color)); width: 0%; transition: width 0.3s ease;"></div>
+                </div>
+                <span id="completenessScoreHeader" style="font-weight: 700; color: var(--primary-color); font-size: 15px; white-space: nowrap;">0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal Information Section -->
+      <div class="profile-section">
+        <h2><i class="fas fa-user-circle"></i> Personal Information</h2>
+
+        <!-- Edit Mode - Form with inputs -->
+        <form id="profileForm" style="display: none;">
+          <div class="profile-grid">
+            <div class="profile-field">
+              <label>Full Name</label>
+              <input type="text" id="name" placeholder="Your full name" disabled>
+            </div>
+            <div class="profile-field">
+              <label>Email Address</label>
+              <input type="email" id="email" placeholder="your@email.com" disabled>
+            </div>
+            <div class="profile-field">
+              <label>Phone Number</label>
+              <input type="tel" id="phone" placeholder="+880 1234 567890" disabled>
+            </div>
+            <div class="profile-field">
+              <label>National ID (NID)</label>
+              <input type="text" id="nid" placeholder="Your NID number" disabled>
+            </div>
+            <div class="profile-field">
+              <label>Date of Birth</label>
+              <input type="date" id="dob" disabled>
+            </div>
+            <div class="profile-field">
+              <label>Gender</label>
+              <select id="gender" disabled>
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="profile-field" style="grid-column: 1 / -1;">
+              <label>Address</label>
+              <input type="text" id="address" placeholder="Your address" disabled>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button type="button" id="editBtn" class="btn-save"><i class="fas fa-edit"></i> Edit Profile</button>
+            <button type="button" id="saveBtn" class="btn-save" style="display: none;"><i class="fas fa-save"></i> Save Changes</button>
+            <button type="button" id="cancelBtn" class="btn-cancel" style="display: none;"><i class="fas fa-times"></i> Cancel</button>
+            <button type="button" id="changePassBtn" class="btn-secondary"><i class="fas fa-lock"></i> Change Password</button>
+          </div>
+
+          <!-- Change Password Section -->
+          <div id="changePassSection" class="change-password-section">
+            <div class="profile-field">
+              <label>Current Password</label>
+              <input type="password" id="currentPass" placeholder="Enter current password">
+            </div>
+            <div class="profile-field">
+              <label>New Password</label>
+              <input type="password" id="newPass" placeholder="Enter new password (min 6 characters)">
+            </div>
+            <div class="profile-field">
+              <label>Confirm Password</label>
+              <input type="password" id="confirmPass" placeholder="Confirm new password">
+            </div>
+            <div class="password-buttons">
+              <button type="button" id="submitPassBtn" class="btn-save"><i class="fas fa-check"></i> Update Password</button>
+              <button type="button" id="cancelPassBtn" class="btn-cancel"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+          </div>
+        </form>
+
+        <!-- View Mode - Display only -->
+        <div id="profileDisplay">
+          <div class="profile-grid">
+            <div class="profile-field-display">
+              <label>Full Name</label>
+              <div class="profile-field-display-value" id="nameDisplay"></div>
+            </div>
+            <div class="profile-field-display">
+              <label>Email Address</label>
+              <div class="profile-field-display-value" id="emailDisplay"></div>
+            </div>
+            <div class="profile-field-display">
+              <label>Phone Number</label>
+              <div class="profile-field-display-value" id="phoneDisplay"></div>
+            </div>
+            <div class="profile-field-display">
+              <label>National ID (NID)</label>
+              <div class="profile-field-display-value" id="nidDisplay"></div>
+            </div>
+            <div class="profile-field-display">
+              <label>Date of Birth</label>
+              <div class="profile-field-display-value" id="dobDisplay"></div>
+            </div>
+            <div class="profile-field-display">
+              <label>Gender</label>
+              <div class="profile-field-display-value" id="genderDisplay"></div>
+            </div>
+            <div class="profile-field-display" style="grid-column: 1 / -1;">
+              <label>Address</label>
+              <div class="profile-field-display-value" id="addressDisplay"></div>
+            </div>
+          </div>
+
+          <!-- View Mode Action Buttons -->
+          <div class="action-buttons">
+            <button type="button" id="switchToEditBtn" class="btn-save"><i class="fas fa-edit"></i> Edit Profile</button>
+            <button type="button" id="changePassBtnView" class="btn-secondary"><i class="fas fa-lock"></i> Change Password</button>
+          </div>
+
+          <!-- Change Password Section (View Mode) -->
+          <div id="changePassSectionView" class="change-password-section">
+            <div class="profile-field">
+              <label>Current Password</label>
+              <input type="password" id="currentPassView" placeholder="Enter current password">
+            </div>
+            <div class="profile-field">
+              <label>New Password</label>
+              <input type="password" id="newPassView" placeholder="Enter new password (min 6 characters)">
+            </div>
+            <div class="profile-field">
+              <label>Confirm Password</label>
+              <input type="password" id="confirmPassView" placeholder="Confirm new password">
+            </div>
+            <div class="password-buttons">
+              <button type="button" id="submitPassBtnView" class="btn-save"><i class="fas fa-check"></i> Update Password</button>
+              <button type="button" id="cancelPassBtnView" class="btn-cancel"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Section -->
+      <div class="profile-section">
+        <h2><i class="fas fa-chart-bar"></i> Complaint Statistics</h2>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-number" id="totalComplaints">0</div>
+            <div class="stat-label">Total Complaints</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="pendingComplaints">0</div>
+            <div class="stat-label">Pending</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="progressComplaints">0</div>
+            <div class="stat-label">In Progress</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="resolvedComplaints">0</div>
+            <div class="stat-label">Resolved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Complaints Section -->
+      <div class="profile-section">
+        <h2><i class="fas fa-history"></i> Recent Complaints</h2>
+        <div id="complaintsList" class="complaints-list">
+          <p class="loading">Loading complaints...</p>
+        </div>
+      </div>
+
+      <!-- Achievement Badges Section -->
+      <div class="profile-section">
+        <h2><i class="fas fa-trophy"></i> Achievement Badges</h2>
+        <div id="badgesGrid" class="badges-grid">
+          <p class="loading">Loading badges...</p>
+        </div>
+      </div>
+
+      <!-- Community Impact Section -->
+      <div class="profile-section">
+        <h2><i class="fas fa-heart"></i> Community Impact</h2>
+        <div class="impact-container">
+          <div class="impact-circle">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="gradientStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:var(--primary-color);stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:var(--success-color);stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <circle cx="50" cy="50" r="45"></circle>
+              <circle cx="50" cy="50" r="45" style="stroke-dasharray: 282; stroke-dashoffset: 282;"></circle>
+            </svg>
+            <div class="impact-value">
+              <div class="impact-number" id="impactValue">0</div>
+              <div class="impact-label">Impact Score</div>
+            </div>
+          </div>
+          <div class="impact-stats">
+            <div class="impact-stat">
+              <div class="impact-stat-label">Issues Resolved</div>
+              <div class="impact-stat-value" id="resolvedImpact">0</div>
+            </div>
+            <div class="impact-stat">
+              <div class="impact-stat-label">People Helped</div>
+              <div class="impact-stat-value" id="communityHelped">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Login History Section -->
+      <div class="profile-section">
+        <h2><i class="fas fa-sign-in-alt"></i> Login History</h2>
+        <div class="last-login-badge" id="lastLogin">Last login: -</div>
+        <div id="loginHistory" class="history-list">
+          <p class="loading">Loading login history...</p>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="profile-section">
+        <div class="danger-zone">
+          <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 14px;">These actions cannot be undone. Please be careful.</p>
+          <div class="danger-buttons">
+            <button type="button" id="downloadBtn" class="btn-secondary"><i class="fas fa-download"></i> Download Profile Data</button>
+            <button type="button" id="enable2FABtn" class="btn-secondary"><i class="fas fa-shield-alt"></i> Enable 2FA</button>
+            <button type="button" id="deactivateBtn" class="btn-danger"><i class="fas fa-pause-circle"></i> Deactivate Account</button>
+            <button type="button" id="deleteBtn" class="btn-danger"><i class="fas fa-trash-alt"></i> Delete Account</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="citizen-common.js"></script>
+<script>
+  // ==========================================
+  // CORE VARIABLES & INITIALIZATION
+  // ==========================================
+
+  function checkLogin() {
+    const userData = localStorage.getItem('userData');
+    if (!userData) {
+      window.location.href = 'citizen-login.html';
+      return null;
+    }
+    return JSON.parse(userData);
+  }
+
+  const currentUser = checkLogin();
+  let editing = false;
+  let editBtn, inputs, overlay, saveBtn, cancelBtn;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!currentUser) return;
+
+    // Initialize elements
+    editBtn = document.getElementById("editBtn");
+    inputs = document.querySelectorAll("#profileForm input, #profileForm select");
+    overlay = document.getElementById("overlay");
+    saveBtn = document.getElementById("saveBtn");
+    cancelBtn = document.getElementById("cancelBtn");
+
+    const profileForm = document.getElementById("profileForm");
+    const profileDisplay = document.getElementById("profileDisplay");
+
+    // Lock all fields initially
+    inputs.forEach(el => el.disabled = true);
+
+    // Setup event listeners
+    if (editBtn) {
+      editBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (!editing) {
+          // Switch to edit mode
+          profileForm.style.display = "block";
+          profileDisplay.style.display = "none";
+          
+          // Enable fields (except email and nid)
+          inputs.forEach(el => {
+            if (el.id === 'nid' || el.id === 'email') {
+              el.disabled = true;
+            } else {
+              el.disabled = false;
+            }
+          });
+          
+          editBtn.style.display = "none";
+          
+          const changePassBtn = document.getElementById("changePassBtn");
+          if (changePassBtn) changePassBtn.style.display = "none";
+          
+          saveBtn.style.display = 'flex';
+          cancelBtn.style.display = 'flex';
+          editing = true;
+        }
+      });
+    }
+    
+    const changePassBtn = document.getElementById("changePassBtn");
+    if (changePassBtn) changePassBtn.addEventListener("click", toggleChangePasswordSection);
+
+    const changePassBtnView = document.getElementById("changePassBtnView");
+    if (changePassBtnView) changePassBtnView.addEventListener("click", toggleChangePasswordSectionView);
+
+    const switchToEditBtn = document.getElementById("switchToEditBtn");
+    if (switchToEditBtn) {
+      switchToEditBtn.addEventListener("click", () => {
+        editBtn.click();
+      });
+    }
+
+    const cancelPassBtn = document.getElementById("cancelPassBtn");
+    if (cancelPassBtn) cancelPassBtn.addEventListener("click", toggleChangePasswordSection);
+
+    const cancelPassBtnView = document.getElementById("cancelPassBtnView");
+    if (cancelPassBtnView) cancelPassBtnView.addEventListener("click", toggleChangePasswordSectionView);
+
+    const submitPassBtn = document.getElementById("submitPassBtn");
+    if (submitPassBtn) submitPassBtn.addEventListener("click", handlePasswordChange);
+
+    const submitPassBtnView = document.getElementById("submitPassBtnView");
+    if (submitPassBtnView) submitPassBtnView.addEventListener("click", handlePasswordChangeView);
+
+    const downloadBtn = document.getElementById("downloadBtn");
+    if (downloadBtn) downloadBtn.addEventListener("click", downloadProfileData);
+
+    document.getElementById("enable2FABtn").addEventListener("click", () => {
+      showSuccessNotification("2FA setup initiated (Coming soon)");
+    });
+
+    document.getElementById("deactivateBtn").addEventListener("click", () => {
+      if (confirm("Are you sure? Your account will be deactivated.")) {
+        showSuccessNotification("Account deactivation initiated");
+      }
+    });
+
+    document.getElementById("deleteBtn").addEventListener("click", handleDeleteAccount);
+
+    // Load all data
+    loadProfileData();
+    loadComplaintStatistics();
+    loadRecentComplaints();
+    loadLoginHistory();
+  });
+
+  // ==========================================
+  // NOTIFICATION SYSTEM
+  // ==========================================
+
+  function formatDate(dateString) {
+    if (!dateString) return '-';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return dateString;
+      }
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch (err) {
+      return dateString;
+    }
+  }
+
+  function showSuccessNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification success';
+    notification.innerHTML = '✓ ' + message;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add('show'), 10);
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 2000);
+  }
+
+  function showErrorNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification error';
+    notification.innerHTML = '✗ ' + message;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add('show'), 10);
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  // ==========================================
+  // PROFILE DATA MANAGEMENT
+  // ==========================================
+
+  async function loadProfileData() {
+    try {
+      const response = await fetch(`http://127.0.0.1/Smart_City/backend/get-profile.php?user_id=${currentUser.id}`);
+      const data = await response.json();
+
+      if (data.success) {
+        const user = data.user;
+
+        // Update avatar and display name
+        document.getElementById("userAvatarDisplay").textContent = (user.name || 'U').charAt(0).toUpperCase();
+        document.getElementById("displayName").textContent = user.name || 'User';
+
+        // Update form fields
+        document.getElementById("name").value = user.name || '';
+        document.getElementById("email").value = user.email || '';
+        document.getElementById("phone").value = user.phone || '';
+        document.getElementById("nid").value = user.nid || '';
+        document.getElementById("dob").value = user.dob || '';
+        document.getElementById("address").value = user.address || '';
+        document.getElementById("gender").value = user.gender || '';
+
+        // Update display fields (view mode)
+        document.getElementById("nameDisplay").textContent = user.name || '';
+        document.getElementById("emailDisplay").textContent = user.email || '';
+        document.getElementById("phoneDisplay").textContent = user.phone || '';
+        document.getElementById("nidDisplay").textContent = user.nid || '';
+        document.getElementById("dobDisplay").textContent = formatDate(user.dob) || '';
+        document.getElementById("addressDisplay").textContent = user.address || '';
+        document.getElementById("genderDisplay").textContent = user.gender ? user.gender.charAt(0).toUpperCase() + user.gender.slice(1) : '';
+
+        // Update completeness score
+        updateCompletenessScore();
+
+        console.log('Profile loaded:', user);
+      } else {
+        showErrorNotification('Failed to load profile data');
+      }
+    } catch (err) {
+      console.error('Error loading profile:', err);
+      showErrorNotification('Error loading profile');
+    }
+  }
+
+  function updateCompletenessScore() {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const nid = document.getElementById("nid").value.trim();
+    const dob = document.getElementById("dob").value.trim();
+    const address = document.getElementById("address").value.trim();
+
+    let completeness = 0;
+    if (name) completeness += 20;
+    if (email) completeness += 20;
+    if (nid) completeness += 20;
+    if (dob) completeness += 20;
+    if (address) completeness += 20;
+
+    // Update header version
+    if (document.getElementById("completenessBarHeader")) {
+      document.getElementById("completenessBarHeader").style.width = completeness + "%";
+      document.getElementById("completenessScoreHeader").textContent = completeness + "%";
+    }
+    
+    // Show verified badge when 100% complete
+    const verifiedBadge = document.getElementById("verifiedBadge");
+    if (verifiedBadge) {
+      if (completeness === 100) {
+        verifiedBadge.style.display = "flex";
+      } else {
+        verifiedBadge.style.display = "none";
+      }
+    }
+    
+    // Update original version if it exists
+    if (document.getElementById("completenessBar")) {
+      document.getElementById("completenessBar").style.width = completeness + "%";
+      document.getElementById("completenessScore").textContent = completeness;
+    }
+  }
+
+  async function handleEditClick() {
+    if (!editing) {
+      // Enter edit mode
+      inputs.forEach(el => {
+        if (el.id === 'nid' || el.id === 'email') {
+          el.disabled = true;
+        } else {
+          el.disabled = false;
+        }
+      });
+      editBtn.textContent = "Save Changes";
+      editBtn.style.display = 'none';
+      saveBtn.style.display = 'flex';
+      cancelBtn.style.display = 'flex';
+      editing = true;
+      return;
+    }
+
+    // Save mode - handled by saveBtn click
+    await saveProfileData();
+  }
+
+  async function saveProfileData() {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    let address = document.getElementById("address").value.trim();
+
+    if (!name || !email) {
+      showErrorNotification("Name and Email are required");
+      return;
+    }
+
+    // Remove duplicate Dhaka if present
+    if (address) {
+      address = address.replace(/,\s*Dhaka,\s*Dhaka/gi, ', Dhaka')
+                       .replace(/\bDhaka,\s*Dhaka\b/gi, 'Dhaka');
+    }
+
+    editBtn.disabled = true;
+    if (overlay) overlay.classList.add('show');
+
+    try {
+      const response = await fetch('http://127.0.0.1/Smart_City/backend/get-profile.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          name: name,
+          email: email,
+          address: address,
+          phone: document.getElementById('phone')?.value?.trim() || '',
+          nid: document.getElementById('nid')?.value?.trim() || '',
+          dob: document.getElementById('dob')?.value?.trim() || '',
+          gender: document.getElementById('gender')?.value?.trim() || ''
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccessNotification("Profile updated successfully!");
+
+        // Update localStorage
+        currentUser.name = name;
+        currentUser.email = email;
+        localStorage.setItem('userData', JSON.stringify(currentUser));
+
+        // Exit edit mode and switch to view mode
+        const profileForm = document.getElementById("profileForm");
+        const profileDisplay = document.getElementById("profileDisplay");
+        
+        inputs.forEach(el => el.disabled = true);
+        editBtn.style.display = 'flex';
+        
+        const changePassBtn = document.getElementById("changePassBtn");
+        if (changePassBtn) changePassBtn.style.display = "flex";
+        
+        saveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+        
+        profileForm.style.display = "none";
+        profileDisplay.style.display = "block";
+        
+        editing = false;
+
+        // Reload avatar and name
+        loadProfileData();
+      } else {
+        showErrorNotification(data.message || "Failed to update profile");
+      }
+    } catch (err) {
+      showErrorNotification("Network error: " + err.message);
+    } finally {
+      editBtn.disabled = false;
+      if (overlay) overlay.classList.remove('show');
+    }
+  }
+
+  // ==========================================
+  // PASSWORD MANAGEMENT
+  // ==========================================
+
+  function toggleChangePasswordSection() {
+    const section = document.getElementById("changePassSection");
+    if (section.style.display === "none" || !section.style.display) {
+      section.style.display = "block";
+      document.getElementById("currentPass").focus();
+    } else {
+      section.style.display = "none";
+      document.getElementById("currentPass").value = "";
+      document.getElementById("newPass").value = "";
+      document.getElementById("confirmPass").value = "";
+    }
+  }
+
+  function toggleChangePasswordSectionView() {
+    const section = document.getElementById("changePassSectionView");
+    if (section.style.display === "none" || !section.style.display) {
+      section.style.display = "block";
+      document.getElementById("currentPassView").focus();
+    } else {
+      section.style.display = "none";
+      document.getElementById("currentPassView").value = "";
+      document.getElementById("newPassView").value = "";
+      document.getElementById("confirmPassView").value = "";
+    }
+  }
+
+  async function handlePasswordChange() {
+    const currentPass = document.getElementById("currentPass").value.trim();
+    const newPass = document.getElementById("newPass").value.trim();
+    const confirmPass = document.getElementById("confirmPass").value.trim();
+
+    if (!currentPass || !newPass || !confirmPass) {
+      showErrorNotification("Please fill all password fields");
+      return;
+    }
+
+    if (newPass.length < 6) {
+      showErrorNotification("New password must be at least 6 characters");
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      showErrorNotification("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1/Smart_City/backend/change-password.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          current_password: currentPass,
+          new_password: newPass
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccessNotification("Password updated successfully!");
+        toggleChangePasswordSection();
+      } else {
+        showErrorNotification(data.message || "Failed to update password");
+      }
+    } catch (err) {
+      showErrorNotification("Network error: " + err.message);
+    }
+  }
+
+  async function handlePasswordChangeView() {
+    const currentPass = document.getElementById("currentPassView").value.trim();
+    const newPass = document.getElementById("newPassView").value.trim();
+    const confirmPass = document.getElementById("confirmPassView").value.trim();
+
+    if (!currentPass || !newPass || !confirmPass) {
+      showErrorNotification("Please fill all password fields");
+      return;
+    }
+
+    if (newPass.length < 6) {
+      showErrorNotification("New password must be at least 6 characters");
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      showErrorNotification("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1/Smart_City/backend/change-password.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          current_password: currentPass,
+          new_password: newPass
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccessNotification("Password updated successfully!");
+        toggleChangePasswordSectionView();
+      } else {
+        showErrorNotification(data.message || "Failed to update password");
+      }
+    } catch (err) {
+      showErrorNotification("Network error: " + err.message);
+    }
+  }
+
+  // ==========================================
+  // COMPLAINT STATISTICS & HISTORY
+  // ==========================================
+
+  async function loadComplaintStatistics() {
+    try {
+      const response = await fetch(`http://127.0.0.1/Smart_City/backend/get-complaints.php?user_id=${currentUser.id}`);
+      const data = await response.json();
+
+      if (data.success && data.complaints) {
+        const complaints = data.complaints;
+        let total = complaints.length;
+        let pending = complaints.filter(c => c.status && (c.status.toLowerCase() === 'pending' || c.status.toLowerCase() === 'submitted')).length;
+        let progress = complaints.filter(c => c.status && c.status.toLowerCase() === 'in progress').length;
+        let resolved = complaints.filter(c => c.status && c.status.toLowerCase() === 'resolved').length;
+
+        document.getElementById("totalComplaints").textContent = total;
+        document.getElementById("pendingComplaints").textContent = pending;
+        document.getElementById("progressComplaints").textContent = progress;
+        document.getElementById("resolvedComplaints").textContent = resolved;
+
+        // Load badges and impact after stats are updated
+        loadAchievementBadges();
+        loadCommunityImpact();
+      }
+    } catch (err) {
+      console.error('Error loading complaint statistics:', err);
+    }
+  }
+
+  async function loadRecentComplaints() {
+    try {
+      const response = await fetch(`http://127.0.0.1/Smart_City/backend/get-complaints.php?user_id=${currentUser.id}&limit=5`);
+      const data = await response.json();
+
+      const complaintsList = document.getElementById("complaintsList");
+
+      if (data.success && data.complaints && data.complaints.length > 0) {
+        complaintsList.innerHTML = data.complaints.map(complaint => `
+          <div class="complaint-item">
+            <div class="complaint-item-title">${complaint.title || complaint.category}</div>
+            <div class="complaint-item-meta">
+              <span>${formatDate(complaint.created_date || complaint.created_at)}</span>
+              <span class="complaint-status ${(complaint.status || '').toLowerCase().replace(' ', '')}">${complaint.status}</span>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        complaintsList.innerHTML = '<p style="opacity: 0.6; text-align: center; padding: 20px;">No complaints yet</p>';
+      }
+    } catch (err) {
+      console.error('Error loading recent complaints:', err);
+      document.getElementById("complaintsList").innerHTML = '<p style="opacity: 0.6;">Failed to load complaints</p>';
+    }
+  }
+
+  // ==========================================
+  // ACHIEVEMENT BADGES
+  // ==========================================
+
+  function loadAchievementBadges() {
+    const totalComplaints = parseInt(document.getElementById("totalComplaints").textContent) || 0;
+    const resolvedComplaints = parseInt(document.getElementById("resolvedComplaints").textContent) || 0;
+    const pendingComplaints = parseInt(document.getElementById("pendingComplaints").textContent) || 0;
+    const progressComplaints = parseInt(document.getElementById("progressComplaints").textContent) || 0;
+
+    let badges = [
+      { icon: '🚀', name: 'Getting Started', desc: 'File your first complaint', condition: totalComplaints >= 1, level: 1 },
+      { icon: '📝', name: 'Diligent Citizen', desc: 'File 5 complaints', condition: totalComplaints >= 5, level: 2 },
+      { icon: '📋', name: 'Prolific Reporter', desc: 'File 10 complaints', condition: totalComplaints >= 10, level: 3 },
+      { icon: '✅', name: 'Problem Solver', desc: 'Resolve 3 complaints', condition: resolvedComplaints >= 3, level: 4 },
+      { icon: '🎯', name: 'On Track', desc: 'Resolve 5 complaints', condition: resolvedComplaints >= 5, level: 5 },
+      { icon: '⭐', name: 'Community Hero', desc: 'Resolve 10 complaints', condition: resolvedComplaints >= 10, level: 6 },
+      { icon: '💪', name: 'Super Citizen', desc: 'Resolve 20 complaints', condition: resolvedComplaints >= 20, level: 7 },
+      { icon: '🔥', name: 'Active Monitor', desc: '5+ active complaints', condition: (progressComplaints + pendingComplaints) >= 5, level: 8 },
+      { icon: '🌟', name: 'Perfect Record', desc: 'All resolved', condition: totalComplaints > 0 && resolvedComplaints === totalComplaints, level: 9 },
+      { icon: '💎', name: 'Platinum Member', desc: 'File 50 complaints', condition: totalComplaints >= 50, level: 10 },
+      { icon: '👑', name: 'Legend', desc: 'Resolve 50+ complaints', condition: resolvedComplaints >= 50, level: 11 }
+    ];
+
+    // Sequential unlock system
+    badges.forEach((badge, idx) => {
+      if (idx === 0) {
+        badge.earned = true;
+      } else {
+        const prevEarned = badges[idx - 1].earned;
+        badge.earned = prevEarned && badge.condition;
+      }
+    });
+
+    const highestLevel = badges.filter(b => b.earned).length;
+    const maxLevel = badges.length;
+    const progressPercent = (highestLevel / maxLevel) * 100;
+
+    const badgesGrid = document.getElementById("badgesGrid");
+    let html = `
+      <div class="level-progress">
+        <div class="level-text">Achievement Level <span class="current-level">${highestLevel}</span>/<span class="max-level">${maxLevel}</span></div>
+        <div class="progress-bar-badges">
+          <div class="progress-fill-badges" style="width: ${progressPercent}%"></div>
+        </div>
+        <div class="level-subtitle">${highestLevel === maxLevel ? '🏆 You are a Legend!' : `${maxLevel - highestLevel} more to unlock`}</div>
+      </div>
+    `;
+
+    html += badges.map(badge => `
+      <div class="badge-item ${badge.earned ? 'earned' : 'locked'}" data-level="${badge.level}">
+        <div class="badge-icon">${badge.icon}</div>
+        ${badge.earned ? '<div class="badge-check">✓</div>' : ''}
+        <div class="badge-name">${badge.name}</div>
+        <div class="badge-desc">${badge.desc}</div>
+        <div class="badge-level">Lv.${badge.level}</div>
+      </div>
+    `).join('');
+
+    badgesGrid.innerHTML = html;
+  }
+
+  // ==========================================
+  // COMMUNITY IMPACT
+  // ==========================================
+
+  function loadCommunityImpact() {
+    const totalComplaints = parseInt(document.getElementById("totalComplaints").textContent) || 0;
+    const resolvedComplaints = parseInt(document.getElementById("resolvedComplaints").textContent) || 0;
+
+    let impactScore = Math.min(100, resolvedComplaints * 15 + totalComplaints * 5);
+    const peopleHelped = resolvedComplaints * 5;
+
+    document.getElementById("impactValue").textContent = impactScore;
+    document.getElementById("resolvedImpact").textContent = resolvedComplaints;
+    document.getElementById("communityHelped").textContent = peopleHelped;
+
+    // Animate progress ring
+    const circumference = 282;
+    const offset = circumference - (impactScore / 100) * circumference;
+
+    setTimeout(() => {
+      const circle = document.querySelector('circle:nth-of-type(2)');
+      if (circle) {
+        circle.style.strokeDashoffset = offset;
+      }
+    }, 100);
+  }
+
+  // ==========================================
+  // LOGIN HISTORY
+  // ==========================================
+
+  async function loadLoginHistory() {
+    try {
+      const response = await fetch(`http://127.0.0.1/Smart_City/backend/get-login-history.php?user_id=${currentUser.id}`);
+      const data = await response.json();
+
+      const historyList = document.getElementById("loginHistory");
+
+      if (data.success && data.logins && data.logins.length > 0) {
+        const last = data.logins[0];
+        const ts = new Date(last.login_time);
+        const lastLoginDisplay = document.getElementById("lastLoginDisplay");
+        
+        // Update header last login display
+        if (lastLoginDisplay) {
+          lastLoginDisplay.textContent = `Last login: ${ts.toLocaleString()}`;
+        }
+        
+        // Update login history section
+        const lastLoginEl = document.getElementById("lastLogin");
+        if (lastLoginEl) {
+          lastLoginEl.textContent = `Last login: ${ts.toLocaleString()}`;
+        }
+
+        const recentLogins = data.logins.slice(0, 3);
+        historyList.innerHTML = recentLogins.map(login => `
+          <div class="history-item">
+            <div class="history-time">${new Date(login.login_time).toLocaleString()}</div>
+            <div class="history-meta">
+              <span>IP: ${login.ip_address || 'N/A'}</span>
+              <span>${login.device || 'Unknown Device'}</span>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        const lastLoginDisplay = document.getElementById("lastLoginDisplay");
+        if (lastLoginDisplay) {
+          lastLoginDisplay.textContent = 'Last login: -';
+        }
+        historyList.innerHTML = '<p style="opacity: 0.6; text-align: center; padding: 20px;">No login history</p>';
+      }
+    } catch (err) {
+      console.error('Error loading login history:', err);
+      document.getElementById("loginHistory").innerHTML = '<p style="opacity: 0.6;">Failed to load login history</p>';
+    }
+  }
+
+  // ==========================================
+  // PROFILE DATA DOWNLOAD
+  // ==========================================
+
+  function downloadProfileData() {
+    try {
+      const profileData = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        nid: document.getElementById("nid").value,
+        dob: document.getElementById("dob").value,
+        address: document.getElementById("address").value,
+        gender: document.getElementById("gender").value,
+        downloaded_on: new Date().toLocaleString()
+      };
+
+      const dataStr = JSON.stringify(profileData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `smartcity_profile_${currentUser.id}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      showSuccessNotification("Profile downloaded successfully!");
+    } catch (err) {
+      showErrorNotification("Failed to download profile: " + err.message);
+    }
+  }
+
+  // ==========================================
+  // ACCOUNT DELETION
+  // ==========================================
+
+  async function handleDeleteAccount() {
+    const firstConfirm = confirm("⚠ WARNING: This action cannot be undone!\n\nDeleting your account will permanently remove:\n• Your profile information\n• All your complaints\n• Login history\n• All associated data\n\nAre you absolutely sure?");
+
+    if (!firstConfirm) return;
+
+    const password = prompt("Please enter your password to confirm account deletion:");
+    if (!password) {
+      showErrorNotification("Account deletion cancelled");
+      return;
+    }
+
+    const finalConfirm = confirm("This is your LAST CHANCE!\n\nType 'DELETE' in the next dialog to permanently delete your account.");
+    if (!finalConfirm) {
+      showErrorNotification("Account deletion cancelled");
+      return;
+    }
+
+    const deleteConfirmation = prompt("Type DELETE (capital letters) to confirm:");
+    if (deleteConfirmation !== "DELETE") {
+      showErrorNotification("Account deletion cancelled - confirmation text did not match");
+      return;
+    }
+
+    if (overlay) {
+      overlay.querySelector('.overlay-content').textContent = 'Deleting account...';
+      overlay.classList.add('show');
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1/Smart_City/backend/delete-account.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          password: password
+        })
+      });
+
+      const data = await response.json();
+
+      if (overlay) overlay.classList.remove('show');
+
+      if (data.success) {
+        localStorage.removeItem('userData');
+        localStorage.removeItem('citizenLoggedIn');
+        alert('✓ Account deleted successfully\n\nYou will be redirected to the homepage.');
+        window.location.href = '../index/index.html';
+      } else {
+        showErrorNotification(data.message || 'Failed to delete account');
+      }
+    } catch (error) {
+      if (overlay) overlay.classList.remove('show');
+      console.error('Error deleting account:', error);
+      showErrorNotification('Network error: Unable to delete account');
+    }
+  }
+
+  // When saveBtn is clicked, prevent default and call saveProfileData
+  if (document.getElementById('saveBtn')) {
+    document.getElementById('saveBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      saveProfileData();
+    });
+  }
+
+  if (document.getElementById('cancelBtn')) {
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      const profileForm = document.getElementById("profileForm");
+      const profileDisplay = document.getElementById("profileDisplay");
+      
+      loadProfileData();
+      inputs.forEach(el => el.disabled = true);
+      editBtn.style.display = 'flex';
+      
+      const changePassBtn = document.getElementById("changePassBtn");
+      if (changePassBtn) changePassBtn.style.display = "flex";
+      
+      saveBtn.style.display = 'none';
+      cancelBtn.style.display = 'none';
+      
+      // Switch back to view mode
+      profileForm.style.display = "none";
+      profileDisplay.style.display = "block";
+      
+      editing = false;
+    });
+  }
+</script>
+
+</body>
+</html>

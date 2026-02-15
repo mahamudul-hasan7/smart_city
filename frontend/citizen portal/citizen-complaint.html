@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Complaint | SmartCity</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../admin panel/admin-shared.css">
+  <link rel="stylesheet" href="citizen-portal.css">
+  <link rel="stylesheet" href="citizen-complaint.css">
+</head>
+
+<body>
+
+<header class="global-header">
+  <div class="header-left">
+    <button class="menu-btn"><i class="fas fa-bars"></i></button>
+    <a href="#" class="logo-text">Smart<span>City</span></a>
+  </div>
+  <div class="header-right">
+    <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <a href="citizen-portal.html"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="citizen-complaint.html" class="active"><i class="fas fa-plus-circle"></i> New Complaint</a>
+    <a href="my-complaints.html"><i class="fas fa-list"></i> My Complaints</a>
+    <a href="track-status.html"><i class="fas fa-search"></i> Track Status</a>
+    <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+  </aside>
+
+  <main class="main citizen-main">
+
+    <div class="form-container">
+      <form id="complaintForm" class="complaint-form">
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="title"><i class="fas fa-comment"></i> Complaint Title</label>
+            <input type="text" id="title" placeholder="Brief description of the issue" required>
+          </div>
+        </div>
+
+        <div class="form-row two-columns">
+          <div class="form-group">
+            <label for="category"><i class="fas fa-tag"></i> Complaint Type</label>
+            <select id="category" required>
+              <option value="">Select Category</option>
+              <option value="Road">Road & PotHole</option>
+              <option value="Water">Water Supply</option>
+              <option value="Electricity">Electricity & Power</option>
+              <option value="Waste">Waste Management</option>
+              <option value="Drainage">Drainage & Sewage</option>
+              <option value="Public Parks">Public Parks & Gardens</option>
+              <option value="Street Light">Street Light</option>
+              <option value="Traffic">Traffic & Transport</option>
+              <option value="Pollution">Air & Environmental Pollution</option>
+              <option value="Construction">Construction & Renovation</option>
+              <option value="Noise">Noise Complaint</option>
+              <option value="Flooding">Flooding & Waterlogging</option>
+              <option value="Medical">Medical & Health Services</option>
+              <option value="Safety">Public Safety & Security</option>
+              <option value="Building">Building & Infrastructure</option>
+              <option value="Tree">Tree Cutting & Maintenance</option>
+              <option value="Animal">Stray Animals</option>
+              <option value="Sidewalk">Sidewalk & Footpath</option>
+              <option value="Vendor">Unauthorized Vending</option>
+              <option value="Parking">Illegal Parking</option>
+              <option value="Public Transport">Public Transport Issue</option>
+              <option value="Hygiene">Sanitation & Hygiene</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="priority"><i class="fas fa-exclamation-circle"></i> Priority Level</label>
+            <select id="priority">
+              <option value="Normal">Normal</option>
+              <option value="High">High</option>
+              <option value="Emergency">Emergency</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row two-columns">
+          <div class="form-group">
+            <label for="zone"><i class="fas fa-map-marker-alt"></i> Zone / Area</label>
+            <select id="zone" required>
+              <option value="">Select Zone</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="location"><i class="fas fa-road"></i> Street / Location Details</label>
+            <input type="text" id="location" placeholder="e.g., Main Road, Near School" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="description"><i class="fas fa-align-left"></i> Description</label>
+            <textarea id="description" rows="5" placeholder="Provide detailed information about the issue..." required></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary submit-btn">
+            <i class="fas fa-check-circle"></i> Submit Complaint
+          </button>
+          <button type="reset" class="btn btn-secondary">
+            <i class="fas fa-redo"></i> Reset
+          </button>
+        </div>
+
+        <div class="submit-status" id="submitStatus">
+          <div class="loader" id="loader"></div>
+          <div class="success" id="success"><i class="fas fa-check-circle"></i> Complaint Submitted Successfully!</div>
+        </div>
+
+      </form>
+    </div>
+
+  </main>
+</div>
+
+<script src="citizen-common.js"></script>
+<script src="citizen-complaint.js"></script>
+</body>
+</html>

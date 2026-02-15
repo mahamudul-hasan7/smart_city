@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zone Management | SmartCity</title>
+  <link rel="stylesheet" href="admin-shared.css">
+  <link rel="stylesheet" href="admin-zones.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- GLOBAL HEADER -->
+<header class="global-header">
+  <div class="header-left">
+    <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+    <a href="../index/index.html" class="logo-text">Smart<span>City</span></a>
+  </div>
+  <div class="header-right">
+    <span class="page-title">Zone Management</span>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</header>
+
+<div class="layout" id="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <a href="admin-dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="admin-assign.html"><i class="fas fa-tasks"></i> Assign</a>
+    <a href="all-complaints.html"><i class="fas fa-list"></i> All Complaints</a>
+    <a href="admin-departments.html"><i class="fas fa-building"></i> Departments</a>
+    <a href="admin-staff.html"><i class="fas fa-users"></i> Staff</a>
+    <a class="active" href="admin-zones.html"><i class="fas fa-map-marker-alt"></i> Zones</a>
+    <a href="admin-reports.html"><i class="fas fa-file-alt"></i> Reports</a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- PAGE HEADER WITH STAT -->
+    <section class="page-header-container">
+      <div class="page-header">
+        <h1 class="page-title-main">Zone Management</h1>
+        <p class="page-subtitle">Manage city zones, coverage areas, and assigned departments</p>
+      </div>
+
+      <div class="zone-stat-card">
+        <div class="zone-stat-icon">
+          <i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div class="zone-stat-content">
+          <span class="zone-stat-label">Total Zones</span>
+          <span class="zone-stat-value" id="totalZones">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABLE -->
+    <section class="table-box">
+      <div class="table-header">
+        <h2>Zone List</h2>
+        <button class="btn-primary" onclick="window.location.href='admin-add-zone.html'">
+          <i class="fas fa-plus"></i> Add Zone
+        </button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Zone ID</th>
+            <th>Zone Name</th>
+            <th>City</th>
+            <th>Area Description</th>
+          </tr>
+        </thead>
+        <tbody id="zoneTableBody">
+          <!-- JS inject -->
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<script src="admin-zones.js"></script>
+</body>
+</html>

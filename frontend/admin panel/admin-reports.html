@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports & Analytics | SmartCity</title>
+  <link rel="stylesheet" href="admin-shared.css">
+  <link rel="stylesheet" href="admin-reports.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- GLOBAL HEADER -->
+<header class="global-header">
+  <div class="header-left">
+    <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+    <a href="../index/index.html" class="logo-text">Smart<span>City</span></a>
+  </div>
+  <div class="header-right">
+    <span class="page-title">Reports & Analytics</span>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</header>
+
+<div class="layout" id="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <a href="admin-dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="admin-assign.html"><i class="fas fa-tasks"></i> Assign</a>
+    <a href="all-complaints.html"><i class="fas fa-list"></i> All Complaints</a>
+    <a href="admin-departments.html"><i class="fas fa-building"></i> Departments</a>
+    <a href="admin-staff.html"><i class="fas fa-users"></i> Staff</a>
+    <a href="admin-zones.html"><i class="fas fa-map-marker-alt"></i> Zones</a>
+    <a class="active" href="admin-reports.html"><i class="fas fa-file-alt"></i> Reports</a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+      <h1 class="page-title-main">Reports & Analytics</h1>
+      <p class="page-subtitle">Comprehensive insights and performance metrics</p>
+    </section>
+
+    <!-- KEY METRICS -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Total Complaints</span>
+          <i class="fas fa-arrow-trend-up metric-icon-up"></i>
+        </div>
+        <div class="metric-body">
+          <p class="metric-value" id="quickTotal">0</p>
+          <p class="metric-change">All time</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Resolved</span>
+          <i class="fas fa-check-circle metric-icon"></i>
+        </div>
+        <div class="metric-body">
+          <p class="metric-value success" id="quickResolved">0</p>
+          <p class="metric-change">Completed</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Pending</span>
+          <i class="fas fa-hourglass-half metric-icon"></i>
+        </div>
+        <div class="metric-body">
+          <p class="metric-value warning" id="quickPending">0</p>
+          <p class="metric-change">Awaiting action</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Resolution Rate</span>
+          <i class="fas fa-percent metric-icon"></i>
+        </div>
+        <div class="metric-body">
+          <p class="metric-value info" id="quickRate">0%</p>
+          <p class="metric-change">Success ratio</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABS NAVIGATION -->
+    <nav class="reports-nav-tabs">
+      <button class="report-nav-btn active" data-target="overview-panel"><i class="fas fa-gauge"></i> Overview</button>
+      <button class="report-nav-btn" data-target="complaints-panel"><i class="fas fa-list"></i> Complaints</button>
+      <button class="report-nav-btn" data-target="department-panel"><i class="fas fa-building"></i> Department</button>
+      <button class="report-nav-btn" data-target="zone-panel"><i class="fas fa-map"></i> Zone</button>
+      <button class="report-nav-btn" data-target="staff-panel"><i class="fas fa-users"></i> Staff</button>
+      <button class="report-nav-btn" data-target="sla-panel"><i class="fas fa-stopwatch"></i> SLA</button>
+    </nav>
+
+    <!-- OVERVIEW PANEL -->
+    <section id="overview-panel" class="report-panel active">
+      <div class="insights-container">
+        <div class="insights-chart">
+          <h3><i class="fas fa-chart-pie"></i> Status Distribution</h3>
+          <canvas id="statusChart"></canvas>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-exclamation-triangle"></i> Top Problem Areas</h3>
+          <div id="topAreasContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-list"></i> Top Issue Categories</h3>
+          <div id="topCategoriesContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="insights-container">
+        <div class="insights-box">
+          <h3><i class="fas fa-hourglass-half"></i> Complaint Aging</h3>
+          <div id="complaintAgingContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-chart-bar"></i> Department Performance</h3>
+          <div id="deptPerformanceContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-medal"></i> Staff Performance Ranking</h3>
+          <div id="staffPerformanceContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="insights-container">
+        <div class="insights-chart">
+          <h3><i class="fas fa-chart-doughnut"></i> Category Analysis</h3>
+          <canvas id="categoryChart"></canvas>
+        </div>
+
+        <div class="insights-chart">
+          <h3><i class="fas fa-exclamation-circle"></i> Priority Distribution</h3>
+          <canvas id="priorityDistributionChart"></canvas>
+        </div>
+
+        <div class="insights-chart">
+          <h3><i class="fas fa-clock"></i> Response Time Analysis</h3>
+          <canvas id="responseTimeChart"></canvas>
+        </div>
+      </div>
+
+      <div class="insights-container">
+        <div class="insights-box full-width">
+          <h3><i class="fas fa-lightbulb"></i> Key Insights</h3>
+          <div id="keyInsights" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPLAINTS PANEL -->
+    <section id="complaints-panel" class="report-panel hide">
+      <div class="panel-filters">
+        <select id="complaintsDeptFilter" class="filter-select">
+          <option value="">All Departments</option>
+          <option value="1">Road & Transport</option>
+          <option value="2">Water Line</option>
+          <option value="3">Waste Management</option>
+          <option value="4">Electricity</option>
+        </select>
+
+        <select id="complaintsStatusFilter" class="filter-select">
+          <option value="">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Resolved">Resolved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+
+        <input type="date" id="complaintsDateFilter" class="filter-select" placeholder="Filter by date">
+
+        <button class="btn-generate" onclick="generateComplaintsReport()">Generate Report</button>
+        <button class="btn-export" id="exportComplaintsBtn"><i class="fas fa-download"></i> Export CSV</button>
+      </div>
+
+      <div class="insights-container">
+        <div class="insights-chart">
+          <h3><i class="fas fa-chart-bar"></i> Status Breakdown</h3>
+          <canvas id="complaintsStatusChart"></canvas>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-tags"></i> Top Categories</h3>
+          <div id="complaintsCategoriesContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-map-marker-alt"></i> Top Zones</h3>
+          <div id="complaintsZonesContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="insights-chart">
+          <h3><i class="fas fa-pie-chart"></i> Category Distribution</h3>
+          <canvas id="complaintsCategoryChart"></canvas>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Complaint ID</th>
+              <th>Category</th>
+              <th>Zone</th>
+              <th>Status</th>
+              <th>Submitted Date</th>
+              <th>Department</th>
+            </tr>
+          </thead>
+          <tbody id="complaintsTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- DEPARTMENT PANEL -->
+    <section id="department-panel" class="report-panel hide">
+      <div class="insights-container">
+        <div class="insights-chart">
+          <h3><i class="fas fa-chart-bar"></i> Department Performance</h3>
+          <canvas id="deptPerformanceChart"></canvas>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-exclamation-triangle"></i> Critical Overdue</h3>
+          <div id="deptResolutionContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-medal"></i> Top Departments</h3>
+          <div id="topDeptContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="insights-chart">
+          <h3><i class="fas fa-tasks"></i> Status by Department</h3>
+          <canvas id="deptStatusChart"></canvas>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Department</th>
+              <th>Total</th>
+              <th>Resolved</th>
+              <th>Pending</th>
+              <th>In Progress</th>
+              <th>Avg Days</th>
+            </tr>
+          </thead>
+          <tbody id="departmentTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ZONE PANEL -->
+    <section id="zone-panel" class="report-panel hide">
+      <div class="insights-container">
+        <div class="insights-box">
+          <h3><i class="fas fa-map-marker-alt"></i> Zone Summary</h3>
+          <div id="zonesSummaryContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="insights-chart">
+          <h3><i class="fas fa-chart-pie"></i> Distribution by Zone</h3>
+          <canvas id="zoneDistributionChart"></canvas>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-exclamation-triangle"></i> Problem Areas</h3>
+          <div id="zoneProblemAreasContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="insights-chart">
+          <h3><i class="fas fa-tasks"></i> Status Overview</h3>
+          <canvas id="zoneStatusChart"></canvas>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Zone</th>
+              <th>Total</th>
+              <th>Resolved</th>
+              <th>Pending</th>
+              <th>In Progress</th>
+            </tr>
+          </thead>
+          <tbody id="zoneTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- STAFF PANEL -->
+    <section id="staff-panel" class="report-panel hide">
+      <div class="insights-container">
+        <div class="insights-chart">
+          <h3><i class="fas fa-chart-bar"></i> Workload Distribution</h3>
+          <canvas id="staffWorkloadChart"></canvas>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-medal"></i> Top Performers</h3>
+          <div id="topStaffContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="insights-chart">
+          <h3><i class="fas fa-tasks"></i> Resolution Rate</h3>
+          <canvas id="staffResolutionChart"></canvas>
+        </div>
+
+        <div class="insights-box">
+          <h3><i class="fas fa-hourglass-half"></i> Handling Time</h3>
+          <div id="staffTimeContent" style="padding: 1rem;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Staff Name</th>
+              <th>Assigned</th>
+              <th>Resolved</th>
+              <th>In Progress</th>
+              <th>Resolution Rate</th>
+            </tr>
+          </thead>
+          <tbody id="staffTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SLA PANEL -->
+    <section id="sla-panel" class="report-panel hide">
+      <div class="sla-stats">
+        <div class="sla-stat-card">
+          <p class="sla-stat-label">Total Complaints</p>
+          <p class="sla-stat-value" id="slaTotal">0</p>
+        </div>
+        <div class="sla-stat-card">
+          <p class="sla-stat-label">Avg Response (days)</p>
+          <p class="sla-stat-value" id="slaAvgDays">0</p>
+        </div>
+        <div class="sla-stat-card">
+          <p class="sla-stat-label">Max Pending (days)</p>
+          <p class="sla-stat-value" id="slaMaxDays">0</p>
+        </div>
+        <div class="sla-stat-card alert">
+          <p class="sla-stat-label">SLA Breached</p>
+          <p class="sla-stat-value" id="slaBreached">0</p>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Department</th>
+              <th>Avg Time (days)</th>
+              <th>Resolved</th>
+              <th>Overdue</th>
+            </tr>
+          </thead>
+          <tbody id="slaTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="admin-reports.js"></script>
+</body>
+</html>

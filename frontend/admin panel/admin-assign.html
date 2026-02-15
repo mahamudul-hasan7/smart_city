@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assign Complaints | SmartCity Admin</title>
+  <link rel="stylesheet" href="admin-shared.css">
+  <link rel="stylesheet" href="admin-dashboard.css">
+  <link rel="stylesheet" href="admin-assign.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<header class="global-header">
+  <div class="header-left">
+    <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+    <a href="../index/index.html" class="logo-text">Smart<span>City</span></a>
+  </div>
+  <div class="header-right">
+    <span class="page-title">Assign</span>
+    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</header>
+
+<div class="layout" id="layout">
+  <aside class="sidebar" id="sidebar">
+    <a href="admin-dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="admin-assign.html" class="active"><i class="fas fa-tasks"></i> Assign</a>
+    <a href="all-complaints.html"><i class="fas fa-list"></i> All Complaints</a>
+    <a href="admin-departments.html"><i class="fas fa-building"></i> Departments</a>
+    <a href="admin-staff.html"><i class="fas fa-users"></i> Staff</a>
+    <a href="admin-zones.html"><i class="fas fa-map-marker-alt"></i> Zones</a>
+    <a href="admin-reports.html"><i class="fas fa-file-alt"></i> Reports</a>
+  </aside>
+
+  <main class="main">
+    <!-- PAGE HEADER WITH STAT -->
+    <section class="page-header-container">
+      <div class="page-header">
+        <h1 class="page-title-main">Assign Pending Complaints</h1>
+        <p class="page-subtitle">Assign departments and staff to pending complaints quickly.</p>
+      </div>
+
+      <div class="assign-stat-card">
+        <div class="assign-stat-icon">
+          <i class="fas fa-tasks"></i>
+        </div>
+        <div class="assign-stat-content">
+          <span class="assign-stat-label">Pending Assignments</span>
+          <span class="assign-stat-value" id="totalPending">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTERS -->
+    <section class="filters">
+      <input type="text" id="searchInput" placeholder="Search by ID, Category, Area...">
+      <select id="categoryFilter">
+        <option value="">All Categories</option>
+        <option value="Electricity">Electricity</option>
+        <option value="Water">Water</option>
+        <option value="Road">Road</option>
+        <option value="Waste">Waste</option>
+        <option value="Sanitation">Sanitation</option>
+      </select>
+      <select id="statusFilter">
+        <option value="">All Status</option>
+        <option value="unassigned">Unassigned Only</option>
+        <option value="assigned">Assigned Only</option>
+      </select>
+      <button class="btn-search" onclick="applyFilters()"><i class="fas fa-search"></i> Filter</button>
+      <button class="btn-reset" onclick="resetFilters()"><i class="fas fa-redo"></i> Reset</button>
+    </section>
+
+    <!-- PENDING COMPLAINTS -->
+    <section class="table-box">
+      <div class="table-header spaced">
+        <h2>Pending Complaints for Assignment</h2>
+        <div class="hint"><i class="fas fa-info-circle"></i> Changes save instantly when you pick dept/staff.</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Category</th>
+            <th>Area</th>
+            <th>Status</th>
+            <th>Assign Dept</th>
+            <th>Assign Staff</th>
+          </tr>
+        </thead>
+        <tbody id="pendingTableBody">
+          <tr><td colspan="6" style="text-align:center; opacity:0.7;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Success Notification -->
+    <div id="notification" class="notification hidden">
+      <i class="fas fa-check-circle"></i>
+      <span id="notificationText"></span>
+    </div>
+
+  </main>
+</div>
+
+<script src="admin-assign.js"></script>
+</body>
+</html>
