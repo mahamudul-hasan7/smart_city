@@ -776,7 +776,6 @@ body{
   border: 1px solid rgba(56, 189, 248, 0.3);
   color: #fff;
   z-index: 9999;
-  display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
   overflow: hidden;
@@ -1054,7 +1053,7 @@ body{
 }
 
 /* chat open animation */
-#chat-box.show{ display:block; animation: chatIn .2s ease forwards; }
+#chat-box.show { display: flex; animation: chatIn .2s ease forwards; }
 @keyframes chatIn{ from{ transform:translateY(8px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
 /* OVERVIEW BUTTONS */
 .overview-buttons {
