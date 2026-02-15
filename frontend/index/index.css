@@ -727,8 +727,8 @@ body{
   position: fixed;
   bottom: 26px;
   right: 26px;
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   padding: 0;
   border-radius: 50%;
   border: none;
@@ -739,12 +739,14 @@ body{
   background: linear-gradient(135deg, #2dd4bf, #3b82f6);
   box-shadow: 0 10px 30px rgba(0,0,0,.5);
   z-index: 9999;
+  overflow: hidden;
 }
 
 #chat-btn img{
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 #chat-btn .badge{
