@@ -745,7 +745,6 @@ body{
 #chat-btn img{
   width: 36px;
   height: 36px;
-  border-radius: 50%;
   object-fit: cover;
 }
 
@@ -808,7 +807,6 @@ body{
 .bot-info img {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
   background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(74, 222, 128, 0.1));
   box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
   border: 2px solid rgba(56, 189, 248, 0.3);
