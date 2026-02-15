@@ -779,6 +779,11 @@ body{
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+#chat-box.minimized {
+  max-height: 70px;
 }
 
 /* Header */
@@ -840,12 +845,19 @@ body{
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
+  z-index: 10000;
 }
 
 .chat-actions button:hover {
   background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(56, 189, 248, 0.1));
   border-color: rgba(56, 189, 248, 0.4);
   color: #38bdf8;
+  transform: scale(1.08);
+}
+
+.chat-actions button:active {
+  transform: scale(0.95);
 }
 
 /* Body */
@@ -853,11 +865,17 @@ body{
   padding: 16px;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 8px;
   scrollbar-width: thin;
   scrollbar-color: rgba(56, 189, 248, 0.3) transparent;
+  min-height: 0;
+}
+
+#chat-box.minimized .chat-body {
+  display: none;
 }
 
 .chat-body::-webkit-scrollbar {
@@ -951,6 +969,10 @@ body{
   flex-shrink: 0;
 }
 
+#chat-box.minimized .chat-quick {
+  display: none;
+}
+
 .chip {
   border: 1px solid rgba(56, 189, 248, 0.3);
   background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(74, 222, 128, 0.05));
@@ -978,6 +1000,10 @@ body{
   border-top: 1px solid rgba(56, 189, 248, 0.15);
   background: rgba(2, 6, 23, 0.4);
   flex-shrink: 0;
+}
+
+#chat-box.minimized .chat-input {
+  display: none;
 }
 
 .chat-input input {

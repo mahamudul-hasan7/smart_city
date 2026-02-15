@@ -258,15 +258,18 @@
   const chatClose = document.getElementById('chat-close');
   const chips = document.querySelectorAll('.chip');
 
-  chatBtn.addEventListener('click', () => {
+  chatBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
     chatBox.classList.toggle('show');
   });
 
-  chatMin.addEventListener('click', () => {
-    chatBox.classList.remove('show');
+  chatMin.addEventListener('click', (e) => {
+    e.stopPropagation();
+    chatBox.classList.toggle('minimized');
   });
 
-  chatClose.addEventListener('click', () => {
+  chatClose.addEventListener('click', (e) => {
+    e.stopPropagation();
     chatBox.classList.remove('show');
   });
 

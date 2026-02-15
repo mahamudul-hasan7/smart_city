@@ -489,14 +489,24 @@ function toggleChat(open) {
   }
 }
 
-chatBtn.onclick = () => toggleChat();
-chatClose.onclick = () => toggleChat(false);
-chatMin.onclick = () => {
+chatBtn.onclick = (e) => {
+  e.stopPropagation();
+  toggleChat();
+};
+chatClose.onclick = (e) => {
+  e.stopPropagation();
+  toggleChat(false);
+};
+chatMin.onclick = (e) => {
+  e.stopPropagation();
   // collapse to smaller height
-  if (chatBox.style.height === "70px") {
-    chatBox.style.height = "460px";
+  const isMinimized = chatBox.classList.contains("minimized");
+  if (isMinimized) {
+    chatBox.classList.remove("minimized");
+    chatBox.style.maxHeight = "600px";
   } else {
-    chatBox.style.height = "70px";
+    chatBox.classList.add("minimized");
+    chatBox.style.maxHeight = "70px";
   }
 };
 
