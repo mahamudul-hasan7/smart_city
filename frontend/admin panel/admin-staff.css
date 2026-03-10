@@ -1,3 +1,44 @@
+/* Delete row animation */
+.staff-row-deleting {
+  animation: fadeOutRow 0.7s forwards;
+  background: linear-gradient(90deg, #ff4d4d22, #1a2332 80%);
+}
+@keyframes fadeOutRow {
+  0% { opacity: 1; }
+  80% { opacity: 0.2; transform: scale(1.01); }
+  100% { opacity: 0; height: 0; padding: 0; margin: 0; }
+}
+/* Modal styles for delete confirmation */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #1a2332;
+  border-radius: 14px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  text-align: center;
+  min-width: 320px;
+}
+.modal-content h3 {
+  color: #ff4d4d;
+  margin-bottom: 1rem;
+}
+.modal-content p {
+  color: #fff;
+  margin-bottom: 1.5rem;
+}
+.modal-actions {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+}
 /* ===================================================================
    ADMIN STAFF - PAGE-SPECIFIC STYLES
    Global header/sidebar styles inherited from admin-shared.css
@@ -228,6 +269,36 @@ body:not(.edit-mode-active) td:nth-child(4),
 body:not(.edit-mode-active) td:nth-child(5),
 body:not(.edit-mode-active) td:nth-child(7) {
   display: none;
+}
+
+/* Hide Action column except in edit mode */
+body:not(.edit-mode-active) th:last-child,
+body:not(.edit-mode-active) td:last-child {
+  display: none !important;
+}
+
+/* Delete staff button styles */
+.delete-staff-btn {
+  background: linear-gradient(135deg, #ff4d4d, #ff8800);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(255, 77, 77, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.delete-staff-btn:hover {
+  background: linear-gradient(135deg, #ff0000, #ff8800);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(255, 77, 77, 0.25);
+}
+.delete-staff-btn i {
+  pointer-events: none;
 }
 
 table {

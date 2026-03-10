@@ -275,8 +275,9 @@ staffForm.addEventListener("submit", async e => {
       setTimeout(() => {
         overlay.classList.remove("show");
         staffForm.reset();
-        // Optionally redirect to staff list
-        // window.location.href = "admin-staff.html";
+        saveText.style.color = "";
+        // Reload next staff ID to avoid duplicate
+        loadNextStaffID();
       }, 2000);
     } else {
       // Error

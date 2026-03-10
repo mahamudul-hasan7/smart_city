@@ -41,6 +41,19 @@
       color: #ff3232;
     }
 
+    .notification.badge-notification {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 255, 136, 0.2));
+      border: 2px solid rgba(0, 212, 255, 0.5);
+      color: var(--text-primary);
+      animation: badgePulse 0.5s ease-in-out;
+      box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4);
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { transform: translateX(0) scale(1); }
+      50% { transform: translateX(0) scale(1.05); }
+    }
+
     /* Overlay/Modal */
     .overlay {
       position: fixed;
@@ -70,6 +83,8 @@
   <style>
     .profile-container {
       max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
     }
 
     .profile-section {
@@ -155,26 +170,213 @@
       cursor: not-allowed;
     }
 
-    .avatar-section {
+    /* Instagram-style Profile Header */
+    .profile-header-section {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    .cover-image {
+      height: 140px;
+      position: relative;
+      background: linear-gradient(135deg, #0f2847 0%, #1a4d7a 50%, #00d4ff 100%);
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+    }
+
+    .cover-image::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 200"><rect fill="%23ffffff" fill-opacity="0.03" width="100" height="100"/><circle cx="100" cy="50" r="40" fill="%2300d4ff" fill-opacity="0.1"/><circle cx="300" cy="100" r="60" fill="%2300ff88" fill-opacity="0.08"/><rect x="500" y="50" width="80" height="80" fill="%23ffffff" fill-opacity="0.05"/><circle cx="800" cy="80" r="50" fill="%2300d4ff" fill-opacity="0.1"/><path d="M 0 100 Q 300 50 600 100 T 1200 100" stroke="%2300d4ff" stroke-width="2" fill="none" opacity="0.2"/></svg>');
+      background-size: cover;
+      animation: coverFloat 20s ease-in-out infinite;
+    }
+
+    @keyframes coverFloat {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      50% { transform: translateX(-20px) translateY(-10px); }
+    }
+
+    .cover-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+    }
+
+    .cover-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 2;
+    }
+
+    .cover-title {
+      font-size: 36px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      margin: 0;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #ffffff 0%, #00d4ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cover-slogan {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-top: 6px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .profile-info-wrapper {
+      padding: 25px;
       display: flex;
-      align-items: center;
-      gap: 30px;
-      margin-bottom: 20px;
+      gap: 25px;
+      align-items: flex-start;
+    }
+
+    .profile-avatar-container {
+      margin-top: -60px;
+      position: relative;
+      flex-shrink: 0;
     }
 
     .user-avatar {
-      width: 100px;
-      height: 100px;
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--success-color) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
+      font-size: 44px;
       font-weight: 700;
       color: var(--bg-primary);
-      border: 3px solid rgba(0, 212, 255, 0.3);
+      border: 4px solid var(--bg-primary);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
       flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-details {
+      flex: 1;
+      padding-top: 5px;
+    }
+
+    .profile-name-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .verified-badge {
+      color: #00d4ff;
+      font-size: 20px;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 25px;
+      margin-bottom: 15px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .stat-count {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .profile-completeness {
+      margin-top: 15px;
+    }
+
+    .completeness-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .completeness-bar-wrapper {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .completeness-bar-bg {
+      flex: 1;
+      max-width: 250px;
+      height: 6px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .completeness-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+      width: 0%;
+      transition: width 0.6s ease;
+      border-radius: 3px;
+    }
+
+    .completeness-percentage {
+      font-weight: 700;
+      color: var(--primary-color);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    /* Old styles kept for backward compatibility */
+    .avatar-section {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 20px;
     }
 
     .user-info h1 {
@@ -352,6 +554,7 @@
       padding: 20px;
       background: rgba(0, 0, 0, 0.2);
       border-radius: 8px;
+      grid-column: 1 / -1;
     }
 
     .level-text {
@@ -410,16 +613,23 @@
       filter: grayscale(100%);
     }
 
+    .badge-item.locked {
+      opacity: 0.3;
+      filter: grayscale(100%) blur(0.5px);
+    }
+
     .badge-item.earned {
       background: rgba(0, 212, 255, 0.1);
       border-color: rgba(0, 212, 255, 0.3);
       opacity: 1;
       filter: grayscale(0%);
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
     }
 
     .badge-item.earned:hover {
       background: rgba(0, 212, 255, 0.15);
       transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
     }
 
     .badge-icon {
@@ -623,33 +833,6 @@
       color: #ff3232;
     }
 
-    /* Login History */
-    .history-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .history-item {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 6px;
-      padding: 12px;
-      border-left: 3px solid var(--success-color);
-    }
-
-    .history-time {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-
-    .history-meta {
-      display: flex;
-      gap: 15px;
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
     /* Danger Zone */
     .danger-zone {
       margin-top: 30px;
@@ -703,17 +886,6 @@
     .btn-secondary:hover {
       background: rgba(0, 212, 255, 0.15);
       border-color: var(--primary-color);
-    }
-
-    .last-login-badge {
-      display: inline-block;
-      padding: 8px 12px;
-      background: rgba(0, 255, 136, 0.15);
-      color: var(--success-color);
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 15px;
     }
 
     /* View Mode Styles */
@@ -837,6 +1009,55 @@
       .btn-secondary {
         width: 100%;
       }
+
+      /* New Profile Header Responsive */
+      .cover-image {
+        height: 120px;
+      }
+
+      .cover-title {
+        font-size: 28px;
+      }
+
+      .cover-slogan {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+      }
+
+      .profile-info-wrapper {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 18px;
+      }
+
+      .profile-avatar-container {
+        margin-top: -50px;
+      }
+
+      .user-avatar {
+        width: 90px;
+        height: 90px;
+        font-size: 36px;
+        border-width: 3px;
+      }
+
+      .profile-details {
+        padding-top: 8px;
+      }
+
+      .profile-name {
+        font-size: 20px;
+      }
+
+      .profile-stats {
+        justify-content: center;
+        gap: 20px;
+      }
+
+      .completeness-bar-bg {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
@@ -851,7 +1072,7 @@
 <header class="global-header">
   <div class="header-left">
     <button class="menu-btn"><i class="fas fa-bars"></i></button>
-    <a href="#" class="logo-text">Smart<span>City</span></a>
+    <a href="citizen-portal.html" class="logo-text">Smart<span>City</span></a>
   </div>
   <div class="header-right">
     <span class="page-title">Profile</span>
@@ -871,28 +1092,50 @@
   <main class="main citizen-main">
     <div class="profile-container">
       
-      <!-- User Header Section -->
-      <div class="profile-section">
-        <div class="avatar-section">
-          <div class="user-avatar" id="userAvatarDisplay" style="position: relative;">
-            R
-            <span style="position: absolute; bottom: -2px; right: -2px; background: #10b981; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2px solid white;"><i class="fas fa-check"></i></span>
+      <!-- Instagram-style Profile Header -->
+      <div class="profile-header-section">
+        <!-- Cover Image with Smart City Theme -->
+        <div class="cover-image">
+          <div class="cover-overlay"></div>
+          <div class="cover-content">
+            <h2 class="cover-title">My Smart City</h2>
+            <p class="cover-slogan">Together We Build Better Cities</p>
           </div>
-          <div class="user-info">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <h1 id="displayName" style="margin: 0;">Loading...</h1>
-              <span id="verifiedBadge" style="display: none; color: #00d4ff; font-size: 18px; white-space: nowrap;"><i class="fas fa-check-circle"></i></span>
+        </div>
+        
+        <!-- Profile Info Below Cover -->
+        <div class="profile-info-wrapper">
+          <div class="profile-avatar-container">
+            <div class="user-avatar" id="userAvatarDisplay">
+              <span id="avatarText">R</span>
+              <img id="avatarImage" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="Profile">
             </div>
-            <p id="lastLoginDisplay" style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">Last login: -</p>
+          </div>
+          
+          <div class="profile-details">
+            <div class="profile-name-section">
+              <h1 id="displayName" class="profile-name">Loading...</h1>
+              <span id="verifiedBadge" style="display: none;" class="verified-badge">
+                <i class="fas fa-check-circle"></i>
+              </span>
+            </div>
             
-            <!-- Profile Completeness -->
-            <div style="margin-top: 18px;">
-              <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; font-weight: 600;">Profile Completeness</div>
-              <div style="display: flex; gap: 12px; align-items: center;">
-                <div style="width: 280px; height: 16px; background: rgba(0,0,0,0.3); border-radius: 8px; overflow: hidden;">
-                  <div id="completenessBarHeader" style="height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--success-color)); width: 0%; transition: width 0.3s ease;"></div>
-                </div>
-                <span id="completenessScoreHeader" style="font-weight: 700; color: var(--primary-color); font-size: 15px; white-space: nowrap;">0%</span>
+            <div class="profile-stats">
+              <div class="stat-item">
+                <span class="stat-count" id="totalComplaintsCount">0</span>
+                <span class="stat-label">Complaints</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-count" id="resolvedComplaintsCount">0</span>
+                <span class="stat-label">Resolved</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-count" id="inProgressComplaintsCount">0</span>
+                <span class="stat-label">In Progress</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-count" id="pendingComplaintsCount">0</span>
+                <span class="stat-label">Pending</span>
               </div>
             </div>
           </div>
@@ -1031,29 +1274,6 @@
         </div>
       </div>
 
-      <!-- Statistics Section -->
-      <div class="profile-section">
-        <h2><i class="fas fa-chart-bar"></i> Complaint Statistics</h2>
-        <div class="stats-grid">
-          <div class="stat-box">
-            <div class="stat-number" id="totalComplaints">0</div>
-            <div class="stat-label">Total Complaints</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-number" id="pendingComplaints">0</div>
-            <div class="stat-label">Pending</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-number" id="progressComplaints">0</div>
-            <div class="stat-label">In Progress</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-number" id="resolvedComplaints">0</div>
-            <div class="stat-label">Resolved</div>
-          </div>
-        </div>
-      </div>
-
       <!-- Recent Complaints Section -->
       <div class="profile-section">
         <h2><i class="fas fa-history"></i> Recent Complaints</h2>
@@ -1100,15 +1320,6 @@
               <div class="impact-stat-value" id="communityHelped">0</div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Login History Section -->
-      <div class="profile-section">
-        <h2><i class="fas fa-sign-in-alt"></i> Login History</h2>
-        <div class="last-login-badge" id="lastLogin">Last login: -</div>
-        <div id="loginHistory" class="history-list">
-          <p class="loading">Loading login history...</p>
         </div>
       </div>
 
@@ -1239,7 +1450,6 @@
     loadProfileData();
     loadComplaintStatistics();
     loadRecentComplaints();
-    loadLoginHistory();
   });
 
   // ==========================================
@@ -1599,10 +1809,18 @@
         let progress = complaints.filter(c => c.status && c.status.toLowerCase() === 'in progress').length;
         let resolved = complaints.filter(c => c.status && c.status.toLowerCase() === 'resolved').length;
 
-        document.getElementById("totalComplaints").textContent = total;
-        document.getElementById("pendingComplaints").textContent = pending;
-        document.getElementById("progressComplaints").textContent = progress;
-        document.getElementById("resolvedComplaints").textContent = resolved;
+        // Update profile header stats
+        const totalCountEl = document.getElementById("totalComplaintsCount");
+        const resolvedCountEl = document.getElementById("resolvedComplaintsCount");
+        const inProgressCountEl = document.getElementById("inProgressComplaintsCount");
+        const pendingCountEl = document.getElementById("pendingComplaintsCount");
+        if (totalCountEl) totalCountEl.textContent = total;
+        if (resolvedCountEl) resolvedCountEl.textContent = resolved;
+        if (inProgressCountEl) inProgressCountEl.textContent = progress;
+        if (pendingCountEl) pendingCountEl.textContent = pending;
+
+        // Store stats for badge calculations
+        window.complaintStats = { total, pending, progress, resolved };
 
         // Load badges and impact after stats are updated
         loadAchievementBadges();
@@ -1615,7 +1833,7 @@
 
   async function loadRecentComplaints() {
     try {
-      const response = await fetch(`http://127.0.0.1/Smart_City/backend/get-complaints.php?user_id=${currentUser.id}&limit=5`);
+      const response = await fetch(`http://127.0.0.1/Smart_City/backend/get-complaints.php?user_id=${currentUser.id}&limit=3`);
       const data = await response.json();
 
       const complaintsList = document.getElementById("complaintsList");
@@ -1644,38 +1862,64 @@
   // ==========================================
 
   function loadAchievementBadges() {
-    const totalComplaints = parseInt(document.getElementById("totalComplaints").textContent) || 0;
-    const resolvedComplaints = parseInt(document.getElementById("resolvedComplaints").textContent) || 0;
-    const pendingComplaints = parseInt(document.getElementById("pendingComplaints").textContent) || 0;
-    const progressComplaints = parseInt(document.getElementById("progressComplaints").textContent) || 0;
+    // Use stored stats from loadComplaintStatistics
+    const stats = window.complaintStats || { total: 0, pending: 0, progress: 0, resolved: 0 };
+    const totalComplaints = stats.total;
+    const resolvedComplaints = stats.resolved;
+    const pendingComplaints = stats.pending;
+    const progressComplaints = stats.progress;
 
     let badges = [
-      { icon: '🚀', name: 'Getting Started', desc: 'File your first complaint', condition: totalComplaints >= 1, level: 1 },
-      { icon: '📝', name: 'Diligent Citizen', desc: 'File 5 complaints', condition: totalComplaints >= 5, level: 2 },
-      { icon: '📋', name: 'Prolific Reporter', desc: 'File 10 complaints', condition: totalComplaints >= 10, level: 3 },
-      { icon: '✅', name: 'Problem Solver', desc: 'Resolve 3 complaints', condition: resolvedComplaints >= 3, level: 4 },
-      { icon: '🎯', name: 'On Track', desc: 'Resolve 5 complaints', condition: resolvedComplaints >= 5, level: 5 },
-      { icon: '⭐', name: 'Community Hero', desc: 'Resolve 10 complaints', condition: resolvedComplaints >= 10, level: 6 },
-      { icon: '💪', name: 'Super Citizen', desc: 'Resolve 20 complaints', condition: resolvedComplaints >= 20, level: 7 },
-      { icon: '🔥', name: 'Active Monitor', desc: '5+ active complaints', condition: (progressComplaints + pendingComplaints) >= 5, level: 8 },
-      { icon: '🌟', name: 'Perfect Record', desc: 'All resolved', condition: totalComplaints > 0 && resolvedComplaints === totalComplaints, level: 9 },
-      { icon: '💎', name: 'Platinum Member', desc: 'File 50 complaints', condition: totalComplaints >= 50, level: 10 },
-      { icon: '👑', name: 'Legend', desc: 'Resolve 50+ complaints', condition: resolvedComplaints >= 50, level: 11 }
+      { icon: '🚀', name: 'Getting Started', desc: 'File your first complaint', condition: totalComplaints >= 1, level: 1, id: 'badge_1' },
+      { icon: '📝', name: 'Diligent Citizen', desc: 'File 5 complaints', condition: totalComplaints >= 5, level: 2, id: 'badge_2' },
+      { icon: '✅', name: 'Problem Solver', desc: 'Resolve 3 complaints', condition: resolvedComplaints >= 3, level: 3, id: 'badge_3' },
+      { icon: '📋', name: 'Prolific Reporter', desc: 'File 10 complaints', condition: totalComplaints >= 10, level: 4, id: 'badge_4' },
+      { icon: '🎯', name: 'On Track', desc: 'Resolve 5 complaints', condition: resolvedComplaints >= 5, level: 5, id: 'badge_5' },
+      { icon: '🔥', name: 'Active Monitor', desc: '5+ active complaints', condition: (progressComplaints + pendingComplaints) >= 5, level: 6, id: 'badge_6' },
+      { icon: '⭐', name: 'Community Hero', desc: 'Resolve 10 complaints', condition: resolvedComplaints >= 10, level: 7, id: 'badge_7' },
+      { icon: '🌟', name: 'Perfect Record', desc: 'All resolved', condition: totalComplaints >= 5 && resolvedComplaints === totalComplaints, level: 8, id: 'badge_8' },
+      { icon: '💪', name: 'Super Citizen', desc: 'Resolve 20 complaints', condition: resolvedComplaints >= 20, level: 9, id: 'badge_9' },
+      { icon: '💎', name: 'Platinum Member', desc: 'File 50 complaints', condition: totalComplaints >= 50, level: 10, id: 'badge_10' },
+      { icon: '👑', name: 'Legend', desc: 'Resolve 50+ complaints', condition: resolvedComplaints >= 50, level: 11, id: 'badge_11' },
+      { icon: '🏆', name: 'Ultimate Master', desc: 'Resolve 100+ complaints', condition: resolvedComplaints >= 100, level: 12, id: 'badge_12' }
     ];
 
-    // Sequential unlock system
-    badges.forEach((badge, idx) => {
-      if (idx === 0) {
-        badge.earned = true;
-      } else {
-        const prevEarned = badges[idx - 1].earned;
-        badge.earned = prevEarned && badge.condition;
+    // Get previously earned badges from localStorage
+    const earnedBadgesStr = localStorage.getItem('earnedBadges_' + currentUser.id) || '[]';
+    const previouslyEarned = JSON.parse(earnedBadgesStr);
+    const newlyEarned = [];
+
+    // Check each badge independently based on its condition
+    badges.forEach((badge) => {
+      badge.earned = badge.condition;
+      
+      // Check if this is a newly earned badge
+      if (badge.earned && !previouslyEarned.includes(badge.id)) {
+        newlyEarned.push(badge);
       }
     });
+
+    // Save current earned badges
+    const currentEarned = badges.filter(b => b.earned).map(b => b.id);
+    localStorage.setItem('earnedBadges_' + currentUser.id, JSON.stringify(currentEarned));
+
+    // Show notifications for newly earned badges
+    if (newlyEarned.length > 0) {
+      setTimeout(() => {
+        newlyEarned.forEach((badge, index) => {
+          setTimeout(() => {
+            showBadgeNotification(badge);
+          }, index * 1000);
+        });
+      }, 500);
+    }
 
     const highestLevel = badges.filter(b => b.earned).length;
     const maxLevel = badges.length;
     const progressPercent = (highestLevel / maxLevel) * 100;
+
+    // Sort badges by level in ascending order
+    const sortedBadges = [...badges].sort((a, b) => a.level - b.level);
 
     const badgesGrid = document.getElementById("badgesGrid");
     let html = `
@@ -1688,10 +1932,10 @@
       </div>
     `;
 
-    html += badges.map(badge => `
+    html += sortedBadges.map(badge => `
       <div class="badge-item ${badge.earned ? 'earned' : 'locked'}" data-level="${badge.level}">
         <div class="badge-icon">${badge.icon}</div>
-        ${badge.earned ? '<div class="badge-check">✓</div>' : ''}
+        ${badge.earned ? '<div class="badge-check">✓</div>' : '<div class="badge-lock" style="position: absolute; top: 5px; right: 5px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px;"><i class="fas fa-lock"></i></div>'}
         <div class="badge-name">${badge.name}</div>
         <div class="badge-desc">${badge.desc}</div>
         <div class="badge-level">Lv.${badge.level}</div>
@@ -1701,20 +1945,54 @@
     badgesGrid.innerHTML = html;
   }
 
+  function showBadgeNotification(badge) {
+    const notification = document.createElement('div');
+    notification.className = 'notification badge-notification';
+    notification.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="font-size: 32px;">${badge.icon}</div>
+        <div>
+          <div style="font-weight: 700; margin-bottom: 4px;">🎉 Badge Unlocked!</div>
+          <div style="font-size: 14px;">${badge.name}</div>
+          <div style="font-size: 12px; opacity: 0.8;">${badge.desc}</div>
+        </div>
+      </div>
+    `;
+    notification.style.background = 'linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 255, 136, 0.2))';
+    notification.style.border = '2px solid rgba(0, 212, 255, 0.5)';
+    notification.style.backdropFilter = 'blur(10px)';
+    notification.style.padding = '20px';
+    notification.style.maxWidth = '350px';
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.classList.add('show'), 10);
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 4000);
+  }
+
   // ==========================================
   // COMMUNITY IMPACT
   // ==========================================
 
   function loadCommunityImpact() {
-    const totalComplaints = parseInt(document.getElementById("totalComplaints").textContent) || 0;
-    const resolvedComplaints = parseInt(document.getElementById("resolvedComplaints").textContent) || 0;
+    
+    const stats = window.complaintStats || { total: 0, pending: 0, progress: 0, resolved: 0 };
+    const totalComplaints = stats.total;
+    const resolvedComplaints = stats.resolved;
 
     let impactScore = Math.min(100, resolvedComplaints * 15 + totalComplaints * 5);
     const peopleHelped = resolvedComplaints * 5;
 
-    document.getElementById("impactValue").textContent = impactScore;
-    document.getElementById("resolvedImpact").textContent = resolvedComplaints;
-    document.getElementById("communityHelped").textContent = peopleHelped;
+    const impactValueEl = document.getElementById("impactValue");
+    const resolvedImpactEl = document.getElementById("resolvedImpact");
+    const communityHelpedEl = document.getElementById("communityHelped");
+
+    if (impactValueEl) impactValueEl.textContent = impactScore;
+    if (resolvedImpactEl) resolvedImpactEl.textContent = resolvedComplaints;
+    if (communityHelpedEl) communityHelpedEl.textContent = peopleHelped;
 
     // Animate progress ring
     const circumference = 282;
@@ -1726,56 +2004,6 @@
         circle.style.strokeDashoffset = offset;
       }
     }, 100);
-  }
-
-  // ==========================================
-  // LOGIN HISTORY
-  // ==========================================
-
-  async function loadLoginHistory() {
-    try {
-      const response = await fetch(`http://127.0.0.1/Smart_City/backend/get-login-history.php?user_id=${currentUser.id}`);
-      const data = await response.json();
-
-      const historyList = document.getElementById("loginHistory");
-
-      if (data.success && data.logins && data.logins.length > 0) {
-        const last = data.logins[0];
-        const ts = new Date(last.login_time);
-        const lastLoginDisplay = document.getElementById("lastLoginDisplay");
-        
-        // Update header last login display
-        if (lastLoginDisplay) {
-          lastLoginDisplay.textContent = `Last login: ${ts.toLocaleString()}`;
-        }
-        
-        // Update login history section
-        const lastLoginEl = document.getElementById("lastLogin");
-        if (lastLoginEl) {
-          lastLoginEl.textContent = `Last login: ${ts.toLocaleString()}`;
-        }
-
-        const recentLogins = data.logins.slice(0, 3);
-        historyList.innerHTML = recentLogins.map(login => `
-          <div class="history-item">
-            <div class="history-time">${new Date(login.login_time).toLocaleString()}</div>
-            <div class="history-meta">
-              <span>IP: ${login.ip_address || 'N/A'}</span>
-              <span>${login.device || 'Unknown Device'}</span>
-            </div>
-          </div>
-        `).join('');
-      } else {
-        const lastLoginDisplay = document.getElementById("lastLoginDisplay");
-        if (lastLoginDisplay) {
-          lastLoginDisplay.textContent = 'Last login: -';
-        }
-        historyList.innerHTML = '<p style="opacity: 0.6; text-align: center; padding: 20px;">No login history</p>';
-      }
-    } catch (err) {
-      console.error('Error loading login history:', err);
-      document.getElementById("loginHistory").innerHTML = '<p style="opacity: 0.6;">Failed to load login history</p>';
-    }
   }
 
   // ==========================================
@@ -1817,7 +2045,7 @@
   // ==========================================
 
   async function handleDeleteAccount() {
-    const firstConfirm = confirm("⚠ WARNING: This action cannot be undone!\n\nDeleting your account will permanently remove:\n• Your profile information\n• All your complaints\n• Login history\n• All associated data\n\nAre you absolutely sure?");
+    const firstConfirm = confirm("⚠ WARNING: This action cannot be undone!\n\nDeleting your account will permanently remove:\n• Your profile information\n• All your complaints\n• All associated data\n\nAre you absolutely sure?");
 
     if (!firstConfirm) return;
 

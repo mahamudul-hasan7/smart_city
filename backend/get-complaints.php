@@ -17,6 +17,7 @@ try {
     }
     
     $user_id = $_GET['user_id'] ?? 0;
+    $limit = isset($_GET['limit']) ? intval($_GET['limit']) : null;
     
     if (empty($user_id)) {
         http_response_code(400);
@@ -24,9 +25,25 @@ try {
     }
     
     // Use the actual complaint table structure
-    $sql = "SELECT complaint_id as id, title, category, location, 
-            status, created_date
-            FROM complaint WHERE user_id = ? ORDER BY created_date DESC";
+    $sql = "SELECT c.complaint_id as id, c.title, c.category, c.location,
+            COALESCE(cs_latest.status_name, 'Pending') as status,
+            c.created_date
+            FROM complaint c
+            LEFT JOIN (
+                SELECT cs1.complaint_id, cs1.status_name
+                FROM complaint_status cs1
+                INNER JOIN (
+                    SELECT complaint_id, MAX(status_id) AS latest_status_id
+                    FROM complaint_status
+                    GROUP BY complaint_id
+                ) latest ON latest.latest_status_id = cs1.status_id
+            ) cs_latest ON c.complaint_id = cs_latest.complaint_id
+            WHERE c.user_id = ? ORDER BY c.created_date DESC";
+    
+    // Add LIMIT if provided
+    if ($limit !== null && $limit > 0) {
+        $sql .= " LIMIT " . $limit;
+    }
     
     $stmt = $conn->prepare($sql);
     if (!$stmt) {

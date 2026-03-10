@@ -31,17 +31,14 @@ $checkCitizen->execute();
 $citizenResult = $checkCitizen->get_result();
 
 if ($citizenResult->num_rows === 0) {
-    $firstName = 'Citizen';
-    $lastName = 'User';
-    $fullName = 'Citizen User';
+    $nid = 'NID-' . $userId;
+    $dob = '1999-01-01';
+    $gender = null;
     $street = 'Main Street';
     $city = 'Dhaka';
     $area = 'Mirpur';
-    $regDate = date('Y-m-d');
-    $zoneId = 1;
-    
-    $insertCitizen = $conn->prepare("INSERT INTO citizen (user_id, first_name, last_name, full_name, street, city, area, reg_date, zone_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $insertCitizen->bind_param('isssssssi', $userId, $firstName, $lastName, $fullName, $street, $city, $area, $regDate, $zoneId);
+    $insertCitizen = $conn->prepare("INSERT INTO citizen (user_id, nid, dob, gender, street, area, city) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $insertCitizen->bind_param('issssss', $userId, $nid, $dob, $gender, $street, $area, $city);
     $insertCitizen->execute();
 }
 
@@ -57,40 +54,29 @@ $complaints = [
 $insertedCount = 0;
 foreach ($complaints as $complaint) {
     list($title, $desc, $category, $locationArea, $locationStreet, $status) = $complaint;
-    
-    // Map category to dept_id
-    $deptMap = [
-        'Road & Transport' => 1,
-        'Water & Sewerage' => 2,
-        'Waste Management' => 3,
-        'Electricity' => 4,
-        'Other' => null
-    ];
-    $deptId = $deptMap[$category] ?? null;
-    
-    // Map area to zone_id  
-    $zoneMap = ['Mirpur' => 1, 'Dhanmondi' => 2, 'Uttara' => 3];
-    $zoneId = $zoneMap[$locationArea] ?? 1;
-    
+
     // Check if complaint exists
-    $checkComplaint = $conn->prepare("SELECT complaint_id FROM complaint WHERE citizen_id = ? AND description = ? LIMIT 1");
+    $checkComplaint = $conn->prepare("SELECT complaint_id FROM complaint WHERE user_id = ? AND description = ? LIMIT 1");
     $checkComplaint->bind_param('is', $userId, $desc);
     $checkComplaint->execute();
     $complaintResult = $checkComplaint->get_result();
     
     if ($complaintResult && $complaintResult->num_rows === 0) {
         $submittedDate = date('Y-m-d H:i:s');
-        $type = $category;
-        $city = 'Dhaka';
-        
-        if ($deptId === null) {
-            $insertComplaint = $conn->prepare("INSERT INTO complaint (citizen_id, zone_id, description, type, location_city, location_area, location_street, current_status, submitted_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $insertComplaint->bind_param('iisssssss', $userId, $zoneId, $desc, $type, $city, $locationArea, $locationStreet, $status, $submittedDate);
-        } else {
-            $insertComplaint = $conn->prepare("INSERT INTO complaint (citizen_id, zone_id, dept_id, description, type, location_city, location_area, location_street, current_status, submitted_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $insertComplaint->bind_param('iiisssssss', $userId, $zoneId, $deptId, $desc, $type, $city, $locationArea, $locationStreet, $status, $submittedDate);
-        }
+        $location = $locationArea . ', ' . $locationStreet;
+        $insertComplaint = $conn->prepare("INSERT INTO complaint (user_id, title, description, category, location, created_date) VALUES (?, ?, ?, ?, ?, ?)");
+        $insertComplaint->bind_param('isssss', $userId, $title, $desc, $category, $location, $submittedDate);
         $insertComplaint->execute();
+        $complaint_id = $conn->insert_id;
+
+        $remarks = 'Inserted by insert-test-for-user1.php';
+        $updated_by = 'system';
+        $statusStmt = $conn->prepare("INSERT INTO complaint_status (complaint_id, status_name, remarks, status_date, updated_by) VALUES (?, ?, ?, ?, ?)");
+        if ($statusStmt) {
+            $statusStmt->bind_param('issss', $complaint_id, $status, $remarks, $submittedDate, $updated_by);
+            $statusStmt->execute();
+            $statusStmt->close();
+        }
         $insertedCount++;
     }
 }

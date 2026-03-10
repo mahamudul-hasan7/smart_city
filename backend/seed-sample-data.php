@@ -40,7 +40,8 @@ $summary = [
     'departments' => 0,
     'users' => 0,
     'citizens' => 0,
-    'staff' => 0,
+    'staff_users' => 0,
+    'staff_profiles' => 0,
     'complaints' => 0,
     'status_history' => 0
 ];
@@ -48,11 +49,11 @@ $summary = [
 $conn->begin_transaction();
 try {
     // Zones
-    if (table_exists($conn, 'Zone')) {
+    if (table_exists($conn, 'zone')) {
         $zones = ['Mirpur','Dhanmondi','Uttara','Gulshan','Mohammadpur'];
-        $selZ = $conn->prepare("SELECT zone_id FROM Zone WHERE name = ? LIMIT 1");
-        $maxZ = (int) get_scalar($conn, "SELECT COALESCE(MAX(zone_id),0) FROM Zone");
-        $insZ = $conn->prepare("INSERT INTO Zone (zone_id, name) VALUES (?, ?)");
+        $selZ = $conn->prepare("SELECT zone_id FROM zone WHERE name = ? LIMIT 1");
+        $maxZ = (int) get_scalar($conn, "SELECT COALESCE(MAX(zone_id),0) FROM zone");
+        $insZ = $conn->prepare("INSERT INTO zone (zone_id, name, city_name, area_description) VALUES (?, ?, 'Dhaka', 'Residential area')");
         foreach ($zones as $name) {
             $selZ->bind_param('s', $name); $selZ->execute(); $r = $selZ->get_result();
             if ($r && $r->num_rows) continue;
@@ -64,24 +65,29 @@ try {
     }
 
     // Departments
-    if (table_exists($conn, 'Department')) {
+    if (table_exists($conn, 'department')) {
         $deps = [
             [1, 'Road & Transport'],
             [2, 'Water & Sewerage'],
             [3, 'Waste Management'],
             [4, 'Electricity']
         ];
-        $sel = $conn->prepare("SELECT dept_id FROM Department WHERE dept_id = ? OR name = ? LIMIT 1");
-        $ins = $conn->prepare("INSERT INTO Department (dept_id, name) VALUES (?, ?)");
+        $sel = $conn->prepare("SELECT dept_id FROM department WHERE dept_id = ? OR name = ? LIMIT 1");
+        $ins = $conn->prepare("INSERT INTO department (dept_id, name, email, phone_no, office_street, office_city, office_area) VALUES (?, ?, ?, '', '', 'Dhaka', '')");
         foreach ($deps as $d) {
             [$id,$name] = $d;
             $sel->bind_param('is', $id, $name); $sel->execute(); $r = $sel->get_result();
-            if (!$r || $r->num_rows === 0) { $ins->bind_param('is', $id, $name); $ins->execute(); $summary['departments']++; }
+            if (!$r || $r->num_rows === 0) {
+                $email = strtolower(str_replace([' & ', ' '], ['.', '.'], $name)) . '@smartcity.gov';
+                $ins->bind_param('iss', $id, $name, $email);
+                $ins->execute();
+                $summary['departments']++;
+            }
         }
     }
 
     // Users and Citizens
-    if (table_exists($conn, 'user') && table_exists($conn, 'Citizen')) {
+    if (table_exists($conn, 'user') && table_exists($conn, 'citizen')) {
         $people = [
             ['Rahim Uddin','rahim@example.com','Citizen'],
             ['Nusrat Jahan','nusrat@example.com','Citizen'],
@@ -99,44 +105,59 @@ try {
             $summary['users']++;
             $uid = $conn->insert_id;
             if ($role === 'Citizen') {
-                $first = explode(' ', $name, 2)[0]; $last = trim(substr($name, strlen($first)));
-                $reg = date('Y-m-d'); $city='Dhaka';
-                $insC = $conn->prepare("INSERT INTO Citizen (user_id, first_name, last_name, full_name, city, reg_date, nid_no, dob) VALUES (?,?,?,?,?,?,?,?)");
                 $nid = 'NID'.strval(1000+$uid); $dob='1995-01-01';
-                $insC->bind_param('isssssss', $uid,$first,$last,$name,$city,$reg,$nid,$dob);
+                $street = ''; $area = ''; $city='Dhaka'; $gender = null;
+                $insC = $conn->prepare("INSERT INTO citizen (user_id, nid, dob, gender, street, area, city) VALUES (?,?,?,?,?,?,?)");
+                $insC->bind_param('issssss', $uid, $nid, $dob, $gender, $street, $area, $city);
                 $insC->execute();
                 $summary['citizens']++;
             }
         }
     }
 
-    // Staff
-    if (table_exists($conn, 'Staff')) {
-        $zoneId = intval(get_scalar($conn, "SELECT zone_id FROM Zone WHERE name='Mirpur' LIMIT 1") ?? 1);
+    // Staff users + profiles
+    if (table_exists($conn, 'staff')) {
+        $zoneId = intval(get_scalar($conn, "SELECT zone_id FROM zone WHERE name='Mirpur' LIMIT 1") ?? 1);
         $staff = [
-            ['Arif Hasan','Inspector','arif@city.gov','01811111111','Active',$zoneId],
-            ['Nabila Rahman','Supervisor','nabila@city.gov','01822222222','Active',$zoneId],
+            ['Arif', 'Hasan','Inspector','arif@city.gov','01811111111','Active',$zoneId,1],
+            ['Nabila', 'Rahman','Supervisor','nabila@city.gov','01822222222','Active',$zoneId,2],
         ];
-        $selS = $conn->prepare("SELECT user_id FROM Staff WHERE email = ? LIMIT 1");
-        $maxS = (int) get_scalar($conn, "SELECT COALESCE(MAX(user_id),0) FROM Staff");
-        $insS = $conn->prepare("INSERT INTO Staff (user_id, full_name, designation, email, phone_no, status, zone_id, joining_date) VALUES (?,?,?,?,?,?,?,?)");
+        $selS = $conn->prepare("SELECT user_id FROM user WHERE email = ? LIMIT 1");
+        $insStaffUser = $conn->prepare("INSERT INTO user (name, email, password, phone_no, role, status) VALUES (?, ?, ?, ?, 'Staff', ?)");
+        $insStaffProfile = $conn->prepare("INSERT INTO staff (user_id, first_name, last_name, designation, joining_date, status, phone_no, zone_id, dept_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $defaultStaffPass = password_hash('Pass@1234', PASSWORD_BCRYPT);
         foreach ($staff as $s) {
-            [$nm,$des,$em,$ph,$st,$zid] = $s; $jd = date('Y-m-d');
+            [$first,$last,$des,$em,$ph,$st,$zid,$deptId] = $s; $jd = date('Y-m-d');
+            $fullName = trim($first . ' ' . $last);
             $selS->bind_param('s', $em); $selS->execute(); $r=$selS->get_result();
-            if ($r && $r->num_rows) continue;
-            $maxS += 1;
-            $insS->bind_param('isssssis', $maxS,$nm,$des,$em,$ph,$st,$zid,$jd);
-            $insS->execute();
-            $summary['staff']++;
+            if ($r && $r->num_rows) {
+                $uid = (int)$r->fetch_assoc()['user_id'];
+            } else {
+                $insStaffUser->bind_param('sssss', $fullName, $em, $defaultStaffPass, $ph, $st);
+                $insStaffUser->execute();
+                $uid = (int)$conn->insert_id;
+                $summary['staff_users']++;
+            }
+
+            $checkProfile = $conn->prepare("SELECT user_id FROM staff WHERE user_id = ? LIMIT 1");
+            $checkProfile->bind_param('i', $uid);
+            $checkProfile->execute();
+            $profileResult = $checkProfile->get_result();
+            if (!$profileResult || $profileResult->num_rows === 0) {
+                $insStaffProfile->bind_param('issssssii', $uid, $first, $last, $des, $jd, $st, $ph, $zid, $deptId);
+                $insStaffProfile->execute();
+                $summary['staff_profiles']++;
+            }
+            $checkProfile->close();
         }
     }
 
     // Complaints + status
-    if (table_exists($conn, 'Complaint')) {
+    if (table_exists($conn, 'complaint')) {
         $citRahim = intval(get_scalar($conn, "SELECT user_id FROM user WHERE email='rahim@example.com' LIMIT 1") ?? 0);
         $citNusrat = intval(get_scalar($conn, "SELECT user_id FROM user WHERE email='nusrat@example.com' LIMIT 1") ?? 0);
-        $zMirpur = intval(get_scalar($conn, "SELECT zone_id FROM Zone WHERE name='Mirpur' LIMIT 1") ?? 1);
-        $zDhan = intval(get_scalar($conn, "SELECT zone_id FROM Zone WHERE name='Dhanmondi' LIMIT 1") ?? 2);
+        $zMirpur = intval(get_scalar($conn, "SELECT zone_id FROM zone WHERE name='Mirpur' LIMIT 1") ?? 1);
+        $zDhan = intval(get_scalar($conn, "SELECT zone_id FROM zone WHERE name='Dhanmondi' LIMIT 1") ?? 2);
 
         $samples = [
             [$citRahim,$zMirpur,1,'Potholes on main street','Road','Dhaka','Mirpur','Road 7','Pending','2026-01-18 10:00:00','High'],
@@ -145,14 +166,16 @@ try {
             [$citNusrat,$zDhan,4,'Street lights not working','Electricity','Dhaka','Dhanmondi','Road 8','Pending','2026-01-20 20:45:00','Low']
         ];
 
-        $selC = $conn->prepare("SELECT complaint_id FROM Complaint WHERE citizen_id=? AND description=? LIMIT 1");
-        $insC = $conn->prepare("INSERT INTO Complaint (citizen_id, zone_id, dept_id, description, type, location_city, location_area, location_street, current_status, submitted_date, priority_level) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+        $selC = $conn->prepare("SELECT complaint_id FROM complaint WHERE user_id=? AND description=? LIMIT 1");
+        $insC = $conn->prepare("INSERT INTO complaint (user_id, title, description, category, location, created_date) VALUES (?,?,?,?,?,?)");
         foreach ($samples as $c) {
             [$cit,$zone,$dept,$desc,$type,$city,$area,$street,$status,$date,$prio] = $c;
             if ($cit <= 0) continue;
             $selC->bind_param('is', $cit, $desc); $selC->execute(); $r=$selC->get_result();
             if ($r && $r->num_rows) continue;
-            $insC->bind_param('iiissssssss', $cit,$zone,$dept,$desc,$type,$city,$area,$street,$status,$date,$prio);
+            $location = $area . ', ' . $street;
+            $title = $type . ' Complaint';
+            $insC->bind_param('isssss', $cit,$title,$desc,$type,$location,$date);
             $insC->execute();
             $summary['complaints']++;
             $cid = $conn->insert_id;

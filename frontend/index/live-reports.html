@@ -96,18 +96,37 @@
     <div class="stat-box">
       <span>Total Complaints</span>
       <strong id="totalCount">-</strong>
+      <div class="stat-progress-bar">
+        <div class="stat-progress-fill" id="totalProgress" data-max="200"></div>
+      </div>
     </div>
     <div class="stat-box pending">
       <span>Pending</span>
       <strong id="pendingCount">-</strong>
+      <div class="stat-progress-bar">
+        <div class="stat-progress-fill" id="pendingProgress" data-max="100"></div>
+      </div>
+    </div>
+    <div class="stat-box in-progress">
+      <span>In Progress</span>
+      <strong id="inProgressCount">-</strong>
+      <div class="stat-progress-bar">
+        <div class="stat-progress-fill" id="inProgressProgress" data-max="80"></div>
+      </div>
     </div>
     <div class="stat-box resolved">
       <span>Resolved</span>
       <strong id="resolvedCount">-</strong>
+      <div class="stat-progress-bar">
+        <div class="stat-progress-fill" id="resolvedProgress" data-max="100"></div>
+      </div>
     </div>
     <div class="stat-box rejected">
       <span>Rejected</span>
       <strong id="rejectedCount">-</strong>
+      <div class="stat-progress-bar">
+        <div class="stat-progress-fill" id="rejectedProgress" data-max="50"></div>
+      </div>
     </div>
   </div>
 
@@ -282,6 +301,15 @@
     });
   });
 
+  function appendBeforeTyping(chatBody, messageEl) {
+    const typing = document.getElementById('typing');
+    if (typing && typing.parentNode === chatBody) {
+      chatBody.insertBefore(messageEl, typing);
+    } else {
+      chatBody.appendChild(messageEl);
+    }
+  }
+
   function sendMessage() {
     const input = document.getElementById('user-input');
     const msg = input.value.trim();
@@ -291,12 +319,15 @@
     const userMsgDiv = document.createElement('div');
     userMsgDiv.className = 'user-msg';
     userMsgDiv.textContent = msg;
-    chatBody.appendChild(userMsgDiv);
+    appendBeforeTyping(chatBody, userMsgDiv);
 
     input.value = '';
     chatBody.scrollTop = chatBody.scrollHeight;
 
     const typing = document.getElementById('typing');
+    if (typing) {
+      chatBody.appendChild(typing);
+    }
     typing.classList.remove('hidden');
 
     setTimeout(() => {
@@ -304,7 +335,7 @@
       const botMsgDiv = document.createElement('div');
       botMsgDiv.className = 'bot-msg';
       botMsgDiv.textContent = 'Thank you for your message. Our team will assist you shortly!';
-      chatBody.appendChild(botMsgDiv);
+      appendBeforeTyping(chatBody, botMsgDiv);
       chatBody.scrollTop = chatBody.scrollHeight;
     }, 1000);
   }

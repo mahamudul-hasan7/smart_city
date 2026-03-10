@@ -193,182 +193,139 @@ function getProgressPercentage(status) {
   return statusMap[(status || '').toLowerCase()] || 25;
 }
 
-// View timeline (can be extended for modal)
-function viewTimeline(complaintId, event) {
+// View timeline
+async function viewTimeline(complaintId, event) {
   event.preventDefault();
   const complaint = allComplaints.find(c => c.id === complaintId);
-  if (complaint) {
-    const statusMap = {
-      'pending': { icon: '⏳', label: 'Pending', color: '#ffaa00' },
-      'in progress': { icon: '⚙️', label: 'In Progress', color: '#0088cc' },
-      'resolved': { icon: '✅', label: 'Resolved', color: '#00ff88' },
-      'rejected': { icon: '❌', label: 'Rejected', color: '#ff4444' }
-    };
-    
-    const status = (complaint.status || 'pending').toLowerCase();
-    const statusInfo = statusMap[status] || { icon: '📋', label: 'Unknown', color: '#aaa' };
-    const date = formatDate(complaint.created_date || complaint.created_at || complaint.submitted_date);
-    
-    const timelineHtml = `
-      <div style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        padding: 20px;
-      " onclick="event.target === this && closeTimeline()">
-        <div style="
-          background: linear-gradient(135deg, rgba(20, 30, 60, 0.95), rgba(10, 20, 45, 0.95));
-          border: 2px solid rgba(0, 212, 255, 0.3);
-          border-radius: 12px;
-          padding: 40px;
-          max-width: 600px;
-          width: 100%;
-          max-height: 80vh;
-          overflow-y: auto;
-          backdrop-filter: blur(10px);
-        " id="timelineModal">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <h2 style="margin: 0; color: #00d4ff; font-size: 24px;">Complaint Timeline</h2>
-            <button onclick="closeTimeline()" style="
-              background: transparent;
-              border: none;
-              color: #00d4ff;
-              font-size: 24px;
-              cursor: pointer;
-              padding: 0;
-              width: 30px;
-              height: 30px;
-            ">✕</button>
-          </div>
-          
-          <div style="background: rgba(0, 212, 255, 0.05); border-left: 3px solid #00d4ff; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
-            <div style="color: #00d4ff; font-weight: 600; margin-bottom: 10px;">ID #${complaint.id}</div>
-            <h3 style="margin: 0 0 15px 0; color: #fff; font-size: 18px;">${escapeHtml(complaint.title || complaint.description || 'No title')}</h3>
-            <div style="color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.6;">
-              <div><strong>Status:</strong> <span style="color: ${statusInfo.color};">${statusInfo.icon} ${statusInfo.label}</span></div>
-              <div><strong>Category:</strong> ${complaint.category || complaint.type || 'Other'}</div>
-              <div><strong>Priority:</strong> ${complaint.priority || 'Normal'}</div>
-              <div><strong>Location:</strong> ${complaint.location || complaint.area || 'Not specified'}</div>
-              <div><strong>Submitted:</strong> ${date}</div>
-            </div>
-          </div>
+  if (!complaint) return;
 
-          <div style="margin-bottom: 30px;">
-            <h4 style="color: #00d4ff; margin-bottom: 20px; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">Status Timeline</h4>
-            <div style="position: relative; padding-left: 30px;">
-              <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #00d4ff, #00ff88);"></div>
-              
-              <div style="margin-bottom: 25px;">
-                <div style="
-                  position: absolute;
-                  left: -10px;
-                  top: 0;
-                  width: 18px;
-                  height: 18px;
-                  background: #00d4ff;
-                  border: 3px solid rgba(20, 30, 60, 0.95);
-                  border-radius: 50%;
-                "></div>
-                <div style="font-weight: 600; color: #fff; margin-bottom: 5px;">Submitted</div>
-                <div style="color: rgba(255,255,255,0.6); font-size: 13px;">${date}</div>
-              </div>
+  const statusColors = {
+    'pending':      { icon: '⏳', color: '#ffaa00' },
+    'submitted':    { icon: '📋', color: '#00d4ff' },
+    'under review': { icon: '🔍', color: '#aa88ff' },
+    'in progress':  { icon: '⚙️', color: '#0088cc' },
+    'resolved':     { icon: '✅', color: '#00ff88' },
+    'rejected':     { icon: '❌', color: '#ff4444' }
+  };
 
-              ${status !== 'pending' ? `
-              <div style="margin-bottom: 25px;">
-                <div style="
-                  position: absolute;
-                  left: -10px;
-                  top: 80px;
-                  width: 18px;
-                  height: 18px;
-                  background: #0088cc;
-                  border: 3px solid rgba(20, 30, 60, 0.95);
-                  border-radius: 50%;
-                "></div>
-                <div style="font-weight: 600; color: #fff; margin-bottom: 5px;">Under Review</div>
-                <div style="color: rgba(255,255,255,0.6); font-size: 13px;">Complaint assigned to department</div>
-              </div>
-              ` : ''}
+  const status = (complaint.status || 'pending').toLowerCase();
+  const statusInfo = statusColors[status] || { icon: '📋', color: '#aaa' };
+  const submittedDateTime = formatDateTime(complaint.created_date || complaint.created_at);
 
-              ${status === 'in progress' || status === 'resolved' || status === 'rejected' ? `
-              <div style="margin-bottom: 25px;">
-                <div style="
-                  position: absolute;
-                  left: -10px;
-                  top: 160px;
-                  width: 18px;
-                  height: 18px;
-                  background: #0088cc;
-                  border: 3px solid rgba(20, 30, 60, 0.95);
-                  border-radius: 50%;
-                "></div>
-                <div style="font-weight: 600; color: #fff; margin-bottom: 5px;">In Progress</div>
-                <div style="color: rgba(255,255,255,0.6); font-size: 13px;">Team is working on the issue</div>
-              </div>
-              ` : ''}
+  // Fetch real status history
+  let historyItems = [];
+  try {
+    const res = await fetch(`http://127.0.0.1/Smart_City/backend/get-complaint-status-history.php?complaint_id=${complaintId}`);
+    const data = await res.json();
+    if (data.success && data.history) historyItems = data.history;
+  } catch (e) { /* silent fallback */ }
 
-              ${status === 'resolved' ? `
-              <div>
-                <div style="
-                  position: absolute;
-                  left: -10px;
-                  top: 240px;
-                  width: 18px;
-                  height: 18px;
-                  background: #00ff88;
-                  border: 3px solid rgba(20, 30, 60, 0.95);
-                  border-radius: 50%;
-                "></div>
-                <div style="font-weight: 600; color: #fff; margin-bottom: 5px;">Resolved</div>
-                <div style="color: rgba(255,255,255,0.6); font-size: 13px;">Issue has been successfully resolved</div>
-              </div>
-              ` : ''}
+  // Build a lookup of status name → history entry
+  const historyMap = {};
+  historyItems.forEach(h => { historyMap[h.status.toLowerCase()] = h; });
 
-              ${status === 'rejected' ? `
-              <div>
-                <div style="
-                  position: absolute;
-                  left: -10px;
-                  top: 240px;
-                  width: 18px;
-                  height: 18px;
-                  background: #ff4444;
-                  border: 3px solid rgba(20, 30, 60, 0.95);
-                  border-radius: 50%;
-                "></div>
-                <div style="font-weight: 600; color: #fff; margin-bottom: 5px;">Closed</div>
-                <div style="color: rgba(255,255,255,0.6); font-size: 13px;">Complaint was rejected or closed</div>
-              </div>
-              ` : ''}
-            </div>
-          </div>
+  // Determine final step based on current status
+  const isFinalRejected = status === 'rejected';
+  const finalStep = isFinalRejected
+    ? { dbKey: 'rejected',    icon: '❌', label: 'Rejected',    color: '#ff4444' }
+    : { dbKey: 'resolved',    icon: '✅', label: 'Resolved',    color: '#00ff88' };
 
-          <button onclick="closeTimeline()" style="
-            width: 100%;
-            padding: 12px 20px;
-            background: rgba(0, 212, 255, 0.1);
-            border: 2px solid rgba(0, 212, 255, 0.3);
-            border-radius: 6px;
-            color: #00d4ff;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-          " onmouseover="this.style.background = 'rgba(0, 212, 255, 0.2)'" onmouseout="this.style.background = 'rgba(0, 212, 255, 0.1)'">
-            Close
-          </button>
-        </div>
-      </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', timelineHtml);
+  // Fixed 4 stages — dbKey matches actual DB status_name (lowercase)
+  const stages = [
+    { dbKey: 'submitted',    icon: '📋', label: 'Submitted',    color: '#00d4ff' },
+    { dbKey: 'pending',      icon: '🔍', label: 'Under Review', color: '#aa88ff' },
+    { dbKey: 'in progress',  icon: '⚙️', label: 'In Progress',  color: '#0088cc' },
+    finalStep
+  ];
+
+  // Progression order using actual DB status names
+  const order = ['submitted', 'pending', 'in progress', 'resolved', 'rejected'];
+  const currentIndex = order.indexOf(status) !== -1 ? order.indexOf(status) : 1;
+
+  function stepReached(dbKey) {
+    if (dbKey === 'submitted') return true;
+    const idx = order.indexOf(dbKey);
+    return idx !== -1 && idx <= currentIndex;
   }
+
+  function stepDateTime(dbKey) {
+    if (dbKey === 'submitted') return submittedDateTime;
+    const h = historyMap[dbKey];
+    return h ? formatDateTime(h.updated_date) : null;
+  }
+
+  function stepNotes(dbKey) {
+    const h = historyMap[dbKey];
+    return h && h.notes ? h.notes : '';
+  }
+
+  const timelineSteps = stages.map(stage => {
+    const reached = stepReached(stage.dbKey);
+    const dotColor  = reached ? stage.color : 'rgba(255,255,255,0.15)';
+    const nameColor = reached ? '#fff' : 'rgba(255,255,255,0.3)';
+    const dt = stepDateTime(stage.dbKey);
+    const notes = stepNotes(stage.dbKey);
+    return `
+      <div style="margin-bottom: 28px; position: relative;">
+        <div style="position: absolute; left: -40px; top: 3px; width: 16px; height: 16px;
+          background: ${dotColor}; border: 3px solid rgba(10,20,45,0.97); border-radius: 50%;
+          ${reached ? `box-shadow: 0 0 6px ${stage.color}55;` : ''}"></div>
+        <div style="font-weight: 600; color: ${nameColor}; margin-bottom: 4px;">${reached ? stage.icon : '○'} ${stage.label}</div>
+        ${reached && dt ? `
+          <div style="color: rgba(255,255,255,0.5); font-size: 12px; margin-bottom: 3px;">
+            <i class="fas fa-clock" style="color:#00d4ff; margin-right:5px;"></i>${dt}
+          </div>` : ''}
+        ${!reached ? `<div style="color: rgba(255,255,255,0.25); font-size: 12px;">Not yet reached</div>` : ''}
+        ${notes ? `<div style="color: rgba(255,255,255,0.65); font-size: 13px; margin-top:5px; padding: 7px 10px;
+          background: rgba(255,255,255,0.04); border-radius:4px;">${escapeHtml(notes)}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  const timelineHtml = `
+    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
+      z-index: 9999; padding: 20px;"
+      onclick="event.target === this && closeTimeline()">
+      <div id="timelineModal" style="
+        background: linear-gradient(135deg, rgba(20,30,60,0.97), rgba(10,20,45,0.97));
+        border: 2px solid rgba(0,212,255,0.3); border-radius: 12px; padding: 40px;
+        max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto;
+        backdrop-filter: blur(10px);">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+          <h2 style="margin:0; color:#00d4ff; font-size:24px;">Complaint Timeline</h2>
+          <button onclick="closeTimeline()" style="background:transparent; border:none; color:#00d4ff; font-size:24px; cursor:pointer;">✕</button>
+        </div>
+
+        <div style="background:rgba(0,212,255,0.05); border-left:3px solid #00d4ff; padding:20px; border-radius:6px; margin-bottom:30px;">
+          <div style="color:#00d4ff; font-weight:600; margin-bottom:10px;">ID #${complaint.id}</div>
+          <h3 style="margin:0 0 15px 0; color:#fff; font-size:18px;">${escapeHtml(complaint.title || complaint.description || 'No title')}</h3>
+          <div style="color:rgba(255,255,255,0.7); font-size:14px; line-height:1.8;">
+            <div><strong>Status:</strong> <span style="color:${statusInfo.color};">${statusInfo.icon} ${complaint.status || 'Pending'}</span></div>
+            <div><strong>Category:</strong> ${complaint.category || 'Other'}</div>
+            <div><strong>Priority:</strong> ${complaint.priority || 'Normal'}</div>
+            <div><strong>Location:</strong> ${complaint.location || 'Not specified'}</div>
+            <div><strong>Submitted:</strong> <span style="color:rgba(255,255,255,0.9);">${submittedDateTime}</span></div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:30px;">
+          <h4 style="color:#00d4ff; margin-bottom:20px; text-transform:uppercase; font-size:12px; letter-spacing:0.5px;">Status Timeline</h4>
+          <div style="position:relative; padding-left:40px; border-left:2px solid rgba(0,212,255,0.25);">
+            ${timelineSteps}
+          </div>
+        </div>
+
+        <button onclick="closeTimeline()" style="
+          width:100%; padding:12px 20px;
+          background:rgba(0,212,255,0.1); border:2px solid rgba(0,212,255,0.3);
+          border-radius:6px; color:#00d4ff; font-weight:600; cursor:pointer; transition:all 0.3s ease;"
+          onmouseover="this.style.background='rgba(0,212,255,0.2)'"
+          onmouseout="this.style.background='rgba(0,212,255,0.1)'">Close</button>
+      </div>
+    </div>`;
+
+  document.body.insertAdjacentHTML('beforeend', timelineHtml);
 }
 
 // Close timeline modal
@@ -455,6 +412,25 @@ function formatDate(dateString) {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
+    });
+  } catch (err) {
+    return 'N/A';
+  }
+}
+
+// Format date + time
+function formatDateTime(dateString) {
+  if (!dateString) return 'N/A';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
     });
   } catch (err) {
     return 'N/A';

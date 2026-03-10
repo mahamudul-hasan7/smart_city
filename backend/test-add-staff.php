@@ -4,7 +4,7 @@ header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
 $testData = [
-    'staff_id' => 'S-999',
+    'staff_id' => '202700',
     'full_name' => 'Test Staff',
     'designation' => 'Test Officer',
     'department' => 'Road & Transport',

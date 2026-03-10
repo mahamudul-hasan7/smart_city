@@ -15,17 +15,26 @@ try {
     $query = "
         SELECT 
             s.user_id,
-            s.full_name,
+            CONCAT(COALESCE(s.first_name, ''), CASE WHEN s.last_name IS NULL OR s.last_name = '' THEN '' ELSE ' ' END, COALESCE(s.last_name, '')) as full_name,
             s.designation,
             COUNT(DISTINCT sa.assignment_id) as total_assigned,
-            SUM(CASE WHEN LOWER(c.status) = 'resolved' THEN 1 ELSE 0 END) as resolved_count,
-            SUM(CASE WHEN LOWER(c.status) = 'in progress' THEN 1 ELSE 0 END) as in_progress_count
+            SUM(CASE WHEN LOWER(COALESCE(cs_latest.status_name, 'pending')) = 'resolved' THEN 1 ELSE 0 END) as resolved_count,
+            SUM(CASE WHEN LOWER(COALESCE(cs_latest.status_name, 'pending')) = 'in progress' THEN 1 ELSE 0 END) as in_progress_count
         FROM staff s
         LEFT JOIN staffassignment sa ON s.user_id = sa.staff_id
         LEFT JOIN complaint c ON sa.complaint_id = c.complaint_id
+        LEFT JOIN (
+            SELECT cs1.complaint_id, cs1.status_name
+            FROM complaint_status cs1
+            INNER JOIN (
+                SELECT complaint_id, MAX(status_id) AS latest_status_id
+                FROM complaint_status
+                GROUP BY complaint_id
+            ) latest ON latest.latest_status_id = cs1.status_id
+        ) cs_latest ON c.complaint_id = cs_latest.complaint_id
         WHERE s.status IN ('Active', 'On Duty')
-        GROUP BY s.user_id, s.full_name, s.designation
-        ORDER BY total_assigned DESC, s.full_name ASC
+        GROUP BY s.user_id, s.first_name, s.last_name, s.designation
+        ORDER BY total_assigned DESC, full_name ASC
     ";
     
     $result = $conn->query($query);

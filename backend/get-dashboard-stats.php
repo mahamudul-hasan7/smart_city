@@ -12,17 +12,27 @@ try {
     // Total complaints
     $total = $conn->query("SELECT COUNT(*) as count FROM complaint")->fetch_assoc()['count'];
     
-    // Pending complaints
-    $pending = $conn->query("SELECT COUNT(*) as count FROM complaint WHERE LOWER(status) = 'pending'")->fetch_assoc()['count'];
-    
-    // In Progress
-    $in_progress = $conn->query("SELECT COUNT(*) as count FROM complaint WHERE LOWER(status) = 'in progress'")->fetch_assoc()['count'];
-    
-    // Resolved
-    $resolved = $conn->query("SELECT COUNT(*) as count FROM complaint WHERE LOWER(status) = 'resolved'")->fetch_assoc()['count'];
-    
-    // Rejected / Cancelled
-    $rejected = $conn->query("SELECT COUNT(*) as count FROM complaint WHERE LOWER(status) IN ('rejected','cancelled')")->fetch_assoc()['count'];
+    // Status counters from latest complaint_status rows
+    $statusCountsQuery = "SELECT
+        SUM(CASE WHEN LOWER(COALESCE(cs_latest.status_name, 'Pending')) = 'pending' THEN 1 ELSE 0 END) AS pending,
+        SUM(CASE WHEN LOWER(COALESCE(cs_latest.status_name, 'Pending')) = 'in progress' THEN 1 ELSE 0 END) AS in_progress,
+        SUM(CASE WHEN LOWER(COALESCE(cs_latest.status_name, 'Pending')) = 'resolved' THEN 1 ELSE 0 END) AS resolved,
+        SUM(CASE WHEN LOWER(COALESCE(cs_latest.status_name, 'Pending')) IN ('rejected', 'cancelled') THEN 1 ELSE 0 END) AS rejected
+    FROM complaint c
+    LEFT JOIN (
+        SELECT cs1.complaint_id, cs1.status_name
+        FROM complaint_status cs1
+        INNER JOIN (
+            SELECT complaint_id, MAX(status_id) AS latest_status_id
+            FROM complaint_status
+            GROUP BY complaint_id
+        ) latest ON latest.latest_status_id = cs1.status_id
+    ) cs_latest ON c.complaint_id = cs_latest.complaint_id";
+    $statusCounts = $conn->query($statusCountsQuery)->fetch_assoc();
+    $pending = $statusCounts['pending'] ?? 0;
+    $in_progress = $statusCounts['in_progress'] ?? 0;
+    $resolved = $statusCounts['resolved'] ?? 0;
+    $rejected = $statusCounts['rejected'] ?? 0;
     
     // Total Citizens
     $total_citizens = $conn->query("SELECT COUNT(*) as count FROM citizen")->fetch_assoc()['count'];
@@ -38,12 +48,22 @@ try {
                 c.complaint_id,
                 c.category,
                 c.location,
-                c.status,
+                COALESCE(cs_latest.status_name, 'Pending') AS status,
                 c.created_date,
-                sa.department_id,
+                s.dept_id AS department_id,
                 sa.staff_id
         FROM complaint c
         LEFT JOIN staffassignment sa ON c.complaint_id = sa.complaint_id
+        LEFT JOIN staff s ON sa.staff_id = s.user_id
+        LEFT JOIN (
+            SELECT cs1.complaint_id, cs1.status_name
+            FROM complaint_status cs1
+            INNER JOIN (
+                SELECT complaint_id, MAX(status_id) AS latest_status_id
+                FROM complaint_status
+                GROUP BY complaint_id
+            ) latest ON latest.latest_status_id = cs1.status_id
+        ) cs_latest ON c.complaint_id = cs_latest.complaint_id
         ORDER BY COALESCE(c.created_date, '1970-01-01') DESC
         LIMIT 10";
     

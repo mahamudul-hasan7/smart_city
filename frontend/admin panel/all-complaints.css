@@ -556,3 +556,135 @@ tbody tr:last-child {
     padding: 12px 8px;
   }
 }
+
+/* ============================
+   DELETE BUTTON IN ROW
+============================ */
+.btn-delete-complaint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 0.78rem;
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.08);
+  border: 1px solid rgba(255, 68, 68, 0.35);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.btn-delete-complaint:hover {
+  background: rgba(255, 68, 68, 0.2);
+  border-color: #ff4444;
+}
+
+/* ============================
+   DELETE CONFIRM MODAL
+============================ */
+.complaint-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 4000;
+  align-items: center;
+  justify-content: center;
+}
+.complaint-modal-overlay.show {
+  display: flex;
+}
+
+.complaint-modal {
+  background: linear-gradient(135deg, rgba(18, 28, 58, 0.98), rgba(10, 18, 40, 0.98));
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  border-radius: 14px;
+  width: 420px;
+  max-width: 95vw;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  animation: complaintModalIn 0.22s ease;
+}
+@keyframes complaintModalIn {
+  from { opacity: 0; transform: scale(0.93) translateY(-10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.complaint-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.complaint-modal-header h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.complaint-modal-close {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+.complaint-modal-close:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+.complaint-modal-body {
+  padding: 20px 22px 22px;
+}
+.complaint-modal-body p {
+  color: #ccc;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.complaint-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.btn-cancel {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: #aaa;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-cancel:hover { border-color: #fff; color: #fff; }
+
+.btn-delete-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 22px;
+  background: linear-gradient(135deg, #ff4444, #cc2222);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-delete-confirm:hover { opacity: 0.85; }
+
+.complaint-status-msg {
+  margin-top: 12px;
+  font-size: 0.82rem;
+  min-height: 18px;
+}
+.complaint-status-msg.success { color: #00ff88; }
+.complaint-status-msg.error   { color: #ff4444; }
+

@@ -7,22 +7,19 @@
 </head>
 <body>
 
-<!-- Background -->
-<div class="admin-bg"></div>
+<!-- SAME BACKGROUND AS INDEX -->
+<div class="hero-bg"></div>
 
-<!-- Header -->
-<header class="admin-header">
-  <a href="../index/index.html" class="logo">
-    Smart<span>City</span>
-  </a>
-  <span class="system">Internal Administration</span>
-</header>
+<!-- BACK BUTTON -->
+<a href="../index/index.html" class="back-btn">
+  ← Back to Home
+</a>
 
-<!-- Main -->
-<main class="admin-shell">
+<div class="shell">
 
-  <!-- Left: Authority Context -->
-  <section class="authority">
+  <!-- LEFT CONTEXT -->
+  <section class="context">
+    <span class="badge">Smart City Platform</span>
     <h1>System<br>Control Panel</h1>
     <p>
       Restricted access for authorized administrators.  
@@ -30,48 +27,45 @@
     </p>
 
     <ul>
-      <li>System-wide complaint oversight</li>
-      <li>Department & staff control</li>
-      <li>Performance analytics</li>
-      <li>Audit & reporting tools</li>
+      <li>✔ System-wide complaint oversight</li>
+      <li>✔ Department & staff control</li>
+      <li>✔ Performance analytics</li>
+      <li>✔ Audit & reporting tools</li>
     </ul>
   </section>
 
-  <!-- Right: Login Box -->
-  <section class="login-box">
+  <!-- RIGHT FORM -->
+  <section class="form-zone">
 
-    <div class="login-card">
+    <div class="form-card">
       <h2>Administrator Login</h2>
-      <span class="note">Secure verification required</span>
+      <p class="sub">Secure verification required</p>
 
       <form id="adminForm" novalidate>
 
         <div class="field">
-          <label>Admin ID</label>
           <input type="text" id="adminId" required>
+          <label>Admin ID</label>
           <small></small>
         </div>
 
         <div class="field">
-          <label>Password</label>
           <input type="password" id="adminPass" required>
+          <label>Password</label>
           <small></small>
         </div>
 
-        <button type="submit">
-          Verify & Enter
-        </button>
-
+        <button type="submit">Verify & Enter →</button>
       </form>
 
-      <div class="warning">
+      <div class="footer">
         Unauthorized access is strictly prohibited.
       </div>
     </div>
 
   </section>
 
-</main>
+</div>
 
 <script src="admin-login.js"></script>
 </body>

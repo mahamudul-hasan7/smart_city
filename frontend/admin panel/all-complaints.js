@@ -1,8 +1,53 @@
 // Get API URL helper
 function getApiUrl(endpoint) {
-  // Always use absolute http:// URL for proper CORS handling
   return `http://localhost/Smart_City/backend/${endpoint}`;
 }
+
+/* ── Delete Modal ── */
+let pendingDeleteComplaintId = null;
+const deleteComplaintOverlay = document.getElementById('deleteComplaintOverlay');
+
+function openDeleteComplaintModal(complaintId, displayId) {
+  pendingDeleteComplaintId = complaintId;
+  document.getElementById('deleteComplaintId').textContent = displayId;
+  document.getElementById('deleteComplaintStatus').textContent = '';
+  document.getElementById('deleteComplaintStatus').className = 'complaint-status-msg';
+  deleteComplaintOverlay.classList.add('show');
+}
+
+function closeDeleteComplaintModal() {
+  deleteComplaintOverlay.classList.remove('show');
+  pendingDeleteComplaintId = null;
+}
+
+document.getElementById('closeDeleteComplaintModal').addEventListener('click', closeDeleteComplaintModal);
+document.getElementById('cancelDeleteComplaint').addEventListener('click', closeDeleteComplaintModal);
+deleteComplaintOverlay.addEventListener('click', e => { if (e.target === deleteComplaintOverlay) closeDeleteComplaintModal(); });
+
+document.getElementById('confirmDeleteComplaint').addEventListener('click', async function () {
+  if (!pendingDeleteComplaintId) return;
+  const statusMsg = document.getElementById('deleteComplaintStatus');
+  statusMsg.textContent = 'Deleting...';
+  try {
+    const res  = await fetch(getApiUrl('delete-complaint.php'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ complaint_id: pendingDeleteComplaintId })
+    });
+    const data = await res.json();
+    if (data.success) {
+      statusMsg.textContent = '✓ Deleted!';
+      statusMsg.classList.add('success');
+      setTimeout(() => { closeDeleteComplaintModal(); loadComplaintsData(); }, 700);
+    } else {
+      statusMsg.textContent = data.message || 'Delete failed.';
+      statusMsg.classList.add('error');
+    }
+  } catch (err) {
+    statusMsg.textContent = 'Network error. Try again.';
+    statusMsg.classList.add('error');
+  }
+});
 
 // Load total complaints count
 async function loadTotalComplaints() {
@@ -114,6 +159,9 @@ async function loadComplaintsData(statusFilter = '') {
                   </select>
                   <button class="btn-update" data-id="${complaint.complaintId}" ${isResolved || isRejected ? 'disabled' : ''}>
                     <i class="fas fa-sync"></i>
+                  </button>
+                  <button class="btn-delete-complaint" onclick="openDeleteComplaintModal(${complaint.complaintId}, '${complaint.id}')">
+                    <i class="fas fa-trash"></i>
                   </button>
                   ${isResolved ? '<span class="locked-note">Locked (Resolved)</span>' : ''}
                   ${isRejected ? '<span class="locked-note locked-rejected">Locked (Rejected)</span>' : ''}

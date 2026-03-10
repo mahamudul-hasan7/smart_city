@@ -28,17 +28,29 @@ try {
         c.description,
         c.category,
         c.location,
-        c.status,
+        COALESCE(cs_latest.status_name, 'Pending') as status,
         c.created_date,
-        sa.department_id,
+        c.latitude,
+        c.longitude,
+        s.dept_id as department_id,
         sa.staff_id
     FROM complaint c
     LEFT JOIN staffassignment sa ON c.complaint_id = sa.complaint_id
+    LEFT JOIN staff s ON sa.staff_id = s.user_id
+    LEFT JOIN (
+        SELECT cs1.complaint_id, cs1.status_name
+        FROM complaint_status cs1
+        INNER JOIN (
+            SELECT complaint_id, MAX(status_id) AS latest_status_id
+            FROM complaint_status
+            GROUP BY complaint_id
+        ) latest ON latest.latest_status_id = cs1.status_id
+    ) cs_latest ON c.complaint_id = cs_latest.complaint_id
     WHERE 1=1";
     
     if (!empty($status_filter)) {
         $safeStatus = $conn->real_escape_string($status_filter);
-        $query .= " AND LOWER(c.status) = LOWER('$safeStatus')";
+        $query .= " AND LOWER(COALESCE(cs_latest.status_name, 'Pending')) = LOWER('$safeStatus')";
     }
     
     if (!empty($zone_filter)) {
@@ -63,9 +75,15 @@ try {
             'citizen' => 'N/A',
             'category' => $row['category'] ?? 'N/A',
             'zone' => $row['location'] ?? 'N/A',
+            'location' => $row['location'] ?? 'N/A',
             'status' => $row['status'] ?? 'Pending',
             'description' => $row['description'] ?? '',
             'date' => $row['created_date'] ?? '',
+            'created_date' => $row['created_date'] ?? '',
+            'latitude' => $row['latitude'] ?? null,
+            'longitude' => $row['longitude'] ?? null,
+            'lat' => $row['latitude'] ?? null,
+            'lng' => $row['longitude'] ?? null,
             'dept_id' => $row['department_id'],
             'staff_id' => $row['staff_id']
         ];

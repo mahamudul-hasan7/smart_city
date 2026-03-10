@@ -1,3 +1,13 @@
+/* Delete row animation */
+.dept-row-deleting {
+  animation: fadeOutRow 0.7s forwards;
+  background: linear-gradient(90deg, #ff4d4d22, #1a2332 80%);
+}
+@keyframes fadeOutRow {
+  0% { opacity: 1; }
+  80% { opacity: 0.2; transform: scale(1.01); }
+  100% { opacity: 0; height: 0; padding: 0; margin: 0; }
+}
 /* PAGE HEADER WITH STAT */
 .page-header-container {
   display: flex;
@@ -309,3 +319,169 @@ tbody tr:last-child {
     padding: 12px 8px;
   }
 }
+
+/* Edit Mode Button */
+.btn-edit-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffaa00;
+  background: transparent;
+  border: 2px solid #ffaa00;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.btn-edit-mode:hover {
+  background: rgba(255, 170, 0, 0.12);
+}
+.btn-edit-mode.active {
+  background: rgba(255, 170, 0, 0.15);
+  box-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
+}
+
+/* Hide Actions column by default, show only in edit mode */
+table th:last-child,
+table td:last-child {
+  display: none;
+}
+table.edit-mode th:last-child,
+table.edit-mode td:last-child {
+  display: table-cell;
+}
+
+/* ============================
+   DELETE BUTTON IN ROW
+============================ */
+.btn-delete-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.08);
+  border: 1px solid rgba(255, 68, 68, 0.35);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-delete-row:hover {
+  background: rgba(255, 68, 68, 0.2);
+  border-color: #ff4444;
+}
+
+/* ============================
+   DELETE CONFIRM MODAL
+============================ */
+.dept-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 4000;
+  align-items: center;
+  justify-content: center;
+}
+.dept-modal-overlay.show {
+  display: flex;
+}
+
+.dept-modal {
+  background: linear-gradient(135deg, rgba(18, 28, 58, 0.98), rgba(10, 18, 40, 0.98));
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  border-radius: 14px;
+  width: 420px;
+  max-width: 95vw;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  animation: deptModalIn 0.22s ease;
+}
+
+@keyframes deptModalIn {
+  from { opacity: 0; transform: scale(0.93) translateY(-10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.dept-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.dept-modal-header h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dept-modal-close {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+.dept-modal-close:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+.dept-modal-body {
+  padding: 20px 22px 22px;
+}
+.dept-modal-body p {
+  color: #ccc;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.dept-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.btn-cancel {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: #aaa;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-cancel:hover { border-color: #fff; color: #fff; }
+
+.btn-delete-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 22px;
+  background: linear-gradient(135deg, #ff4444, #cc2222);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-delete-confirm:hover { opacity: 0.85; }
+
+.dept-status-msg {
+  margin-top: 12px;
+  font-size: 0.82rem;
+  min-height: 18px;
+}
+.dept-status-msg.success { color: #00ff88; }
+.dept-status-msg.error   { color: #ff4444; }
+

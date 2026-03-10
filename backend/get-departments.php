@@ -34,6 +34,7 @@ try {
     
     while ($row = $result->fetch_assoc()) {
         $departments[] = [
+            'rawId' => (int)$row['dept_id'],
             'id' => $row['id'],
             'name' => $row['name'],
             'email' => $row['email'] ?? 'N/A',

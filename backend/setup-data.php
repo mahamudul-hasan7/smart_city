@@ -35,10 +35,22 @@ $complaints = [
 ];
 
 foreach ($complaints as $c) {
-    $stmt = $conn->prepare("INSERT INTO complaint (user_id, title, description, category, location, status, created_date) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('issssss', $c[0], $c[1], $c[2], $c[3], $c[4], $c[5], $c[6]);
+    $stmt = $conn->prepare("INSERT INTO complaint (user_id, title, description, category, location, created_date) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param('isssss', $c[0], $c[1], $c[2], $c[3], $c[4], $c[6]);
     $stmt->execute();
-    echo "Complaint inserted: {$c[1]}\n";
+
+    $complaint_id = $conn->insert_id;
+    $status_name = str_replace('_', ' ', ucwords(strtolower($c[5]), '_'));
+    $remarks = 'Seeded by setup-data.php';
+    $updated_by = 'system';
+    $statusStmt = $conn->prepare("INSERT INTO complaint_status (complaint_id, status_name, remarks, status_date, updated_by) VALUES (?, ?, ?, ?, ?)");
+    if ($statusStmt) {
+        $statusStmt->bind_param('issss', $complaint_id, $status_name, $remarks, $c[6], $updated_by);
+        $statusStmt->execute();
+        $statusStmt->close();
+    }
+
+    echo "Complaint inserted: {$c[1]} (status: {$status_name})\n";
 }
 
 echo "\nAll data inserted successfully!\n";

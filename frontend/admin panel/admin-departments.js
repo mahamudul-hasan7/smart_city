@@ -1,8 +1,90 @@
 // Get API URL helper
 function getApiUrl(endpoint) {
-  // Always use absolute http:// URL for proper CORS handling
   return `http://localhost/Smart_City/backend/${endpoint}`;
 }
+
+/* ── Edit Mode Toggle ── */
+let editModeActive = false;
+
+function toggleEditMode() {
+  editModeActive = !editModeActive;
+  const table = document.querySelector('.table-box table');
+  const toggleBtn = document.getElementById('editModeToggle');
+  const editModeText = document.getElementById('editModeText');
+  if (editModeActive) {
+    table && table.classList.add('edit-mode');
+    toggleBtn && toggleBtn.classList.add('active');
+    if (editModeText) editModeText.textContent = 'Exit Edit Mode';
+  } else {
+    table && table.classList.remove('edit-mode');
+    toggleBtn && toggleBtn.classList.remove('active');
+    if (editModeText) editModeText.textContent = 'Edit Mode';
+  }
+}
+
+document.getElementById('editModeToggle').addEventListener('click', toggleEditMode);
+
+/* ── Delete Modal ── */
+let pendingDeleteId = null;
+const deleteOverlay = document.getElementById('deleteModalOverlay');
+
+function openDeleteModal(rawId, name) {
+  pendingDeleteId = rawId;
+  document.getElementById('deleteDeptName').textContent = name;
+  document.getElementById('deleteStatusMsg').textContent = '';
+  document.getElementById('deleteStatusMsg').className = 'dept-status-msg';
+  deleteOverlay.classList.add('show');
+}
+
+function closeDeleteModal() {
+  deleteOverlay.classList.remove('show');
+  pendingDeleteId = null;
+}
+
+document.getElementById('closeDeleteModal').addEventListener('click', closeDeleteModal);
+document.getElementById('cancelDeleteModal').addEventListener('click', closeDeleteModal);
+deleteOverlay.addEventListener('click', e => { if (e.target === deleteOverlay) closeDeleteModal(); });
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', async function () {
+  if (!pendingDeleteId) return;
+  const statusMsg = document.getElementById('deleteStatusMsg');
+  statusMsg.textContent = 'Deleting...';
+  statusMsg.className = 'dept-status-msg';
+  // Find the row for animation
+  let row = null;
+  const tbody = document.getElementById('deptTable');
+  if (tbody) {
+    Array.from(tbody.children).forEach(tr => {
+      if (tr.querySelector('.btn-delete-row') && tr.querySelector('.btn-delete-row').getAttribute('onclick')?.includes(pendingDeleteId)) {
+        row = tr;
+      }
+    });
+  }
+  try {
+    const res  = await fetch(getApiUrl('delete-department.php'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dept_id: pendingDeleteId })
+    });
+    const data = await res.json();
+    if (data.success) {
+      statusMsg.textContent = '✓ Deleted!';
+      statusMsg.classList.add('success');
+      if (row) {
+        row.classList.add('dept-row-deleting');
+        setTimeout(() => { closeDeleteModal(); loadDepartmentsData(); }, 700);
+      } else {
+        setTimeout(() => { closeDeleteModal(); loadDepartmentsData(); }, 700);
+      }
+    } else {
+      statusMsg.textContent = data.message || 'Delete failed.';
+      statusMsg.classList.add('error');
+    }
+  } catch (err) {
+    statusMsg.textContent = 'Network error. Try again.';
+    statusMsg.classList.add('error');
+  }
+});
 
 // Load departments data
 async function loadDepartmentsData() {
@@ -24,7 +106,7 @@ async function loadDepartmentsData() {
         if (result.departments.length === 0) {
           tbody.innerHTML = `
             <tr>
-              <td colspan="7" style="text-align:center; opacity:0.7;">
+              <td colspan="8" style="text-align:center; opacity:0.7;">
                 No departments found
               </td>
             </tr>
@@ -32,6 +114,7 @@ async function loadDepartmentsData() {
         } else {
           result.departments.forEach(dept => {
             const tr = document.createElement("tr");
+            const safeName = dept.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
             tr.innerHTML = `
               <td>${dept.id}</td>
               <td>${dept.name}</td>
@@ -40,6 +123,9 @@ async function loadDepartmentsData() {
               <td>${dept.street}</td>
               <td>${dept.area}</td>
               <td>${dept.city}</td>
+              <td>
+                <button class="btn-delete-row" onclick="openDeleteModal('${dept.rawId}', '${safeName}')"><i class="fas fa-trash"></i> Delete</button>
+              </td>
             `;
             tbody.appendChild(tr);
           });
@@ -52,7 +138,7 @@ async function loadDepartmentsData() {
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7" style="text-align:center; color:#ff4444;">
+          <td colspan="8" style="text-align:center; color:#ff4444;">
             Error loading departments. Check XAMPP is running.
           </td>
         </tr>

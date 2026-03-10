@@ -8,7 +8,7 @@
 /* base */
 body{
   height:100vh;
-  background:#05070f;
+  background:#020617;
   color:#f8fafc;
   overflow:hidden;
 }
@@ -238,6 +238,7 @@ footer{
   backdrop-filter: blur(20px);
   background: rgba(255,255,255,0.08);
   border-bottom: 1px solid rgba(255,255,255,0.15);
+  opacity: 0;
 }
 
 .nav-glass nav a {

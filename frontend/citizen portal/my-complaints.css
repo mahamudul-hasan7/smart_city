@@ -20,6 +20,20 @@
   letter-spacing: -0.5px;
 }
 
+/* Header page title override */
+.header-right .page-title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
 .page-subtitle {
   font-size: 16px;
   color: rgba(255, 255, 255, 0.6);

@@ -116,6 +116,42 @@ counters.forEach(counter => {
 });
 
 /* ===================== */
+/* TEAM MODAL */
+/* ===================== */
+document.addEventListener("DOMContentLoaded", () => {
+  const teamOpenBtn = document.getElementById("teamOpenBtn");
+  const teamModal = document.getElementById("teamModal");
+
+  if (!teamOpenBtn || !teamModal) return;
+
+  const closeTargets = teamModal.querySelectorAll("[data-team-close]");
+
+  const openModal = () => {
+    teamModal.classList.add("active");
+    teamModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+  };
+
+  const closeModal = () => {
+    teamModal.classList.remove("active");
+    teamModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+  };
+
+  teamOpenBtn.addEventListener("click", openModal);
+
+  closeTargets.forEach(target => {
+    target.addEventListener("click", closeModal);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && teamModal.classList.contains("active")) {
+      closeModal();
+    }
+  });
+});
+
+/* ===================== */
 /* LEAFLET MAP */
 /* ===================== */
 const map = L.map("map", {
@@ -521,19 +557,33 @@ function renderMessage(role, text) {
   const div = document.createElement("div");
   div.className = role === "user" ? "user-msg" : "bot-msg";
   div.innerText = text;
-  chatBody.appendChild(div);
+  if (typingEl && typingEl.isConnected) {
+    chatBody.insertBefore(div, typingEl);
+  } else {
+    chatBody.appendChild(div);
+  }
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 
 function loadHistory() {
   const list = JSON.parse(localStorage.getItem(STORE_KEY) || "[]");
-  if (!list.length) return;
   chatBody.innerHTML = "";
   list.forEach(m => renderMessage(m.role, m.text));
+  if (typingEl) {
+    chatBody.appendChild(typingEl);
+  }
 }
 
 function showTyping(show) {
-  typingEl.classList.toggle("hidden", !show);
+  if (show) {
+    // Create typing element if it doesn't exist
+    if (!typingEl.isConnected) {
+      chatBody.appendChild(typingEl);
+    }
+    typingEl.classList.remove("hidden");
+  } else {
+    typingEl.classList.add("hidden");
+  }
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 

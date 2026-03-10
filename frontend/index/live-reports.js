@@ -39,7 +39,7 @@ async function loadLiveReports() {
     if (statsData?.success) {
       updateStatsBoxes(statsData.stats);
     } else {
-      updateStatsBoxes({ total: 0, pending: 0, resolved: 0, rejected: 0 });
+      updateStatsBoxes({ total: 0, pending: 0, in_progress: 0, resolved: 0, rejected: 0 });
     }
 
     if (insightsData?.success) {
@@ -57,7 +57,9 @@ async function loadLiveReports() {
 }
 
 async function fetchJson(url) {
-  const response = await fetch(url);
+  const ts = `ts=${Date.now()}`;
+  const urlWithTs = url.includes('?') ? `${url}&${ts}` : `${url}?${ts}`;
+  const response = await fetch(urlWithTs, { cache: 'no-store' });
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
@@ -66,10 +68,34 @@ async function fetchJson(url) {
 
 /* UPDATE STATS BOXES WITH DATABASE DATA */
 function updateStatsBoxes(stats) {
-  document.getElementById('totalCount').innerText = stats.total || 128;
-  document.getElementById('pendingCount').innerText = stats.pending || 34;
-  document.getElementById('resolvedCount').innerText = stats.resolved || 67;
-  document.getElementById('rejectedCount').innerText = stats.rejected || 27;
+  const total = stats.total || 128;
+  const pending = stats.pending || 34;
+  const inProgress = stats.in_progress || 15;
+  const resolved = stats.resolved || 67;
+  const rejected = stats.rejected || 27;
+
+  document.getElementById('totalCount').innerText = total;
+  document.getElementById('pendingCount').innerText = pending;
+  document.getElementById('inProgressCount').innerText = inProgress;
+  document.getElementById('resolvedCount').innerText = resolved;
+  document.getElementById('rejectedCount').innerText = rejected;
+
+  // Animate progress bars
+  animateProgressBar('totalProgress', pending + inProgress + resolved + rejected, total);
+  animateProgressBar('pendingProgress', pending, Math.max(100, pending * 2));
+  animateProgressBar('inProgressProgress', inProgress, Math.max(80, inProgress * 2));
+  animateProgressBar('resolvedProgress', resolved, Math.max(100, resolved * 2));
+  animateProgressBar('rejectedProgress', rejected, Math.max(50, rejected * 2));
+}
+
+function animateProgressBar(elementId, value, max) {
+  const progressFill = document.getElementById(elementId);
+  if (!progressFill) return;
+
+  const percentage = Math.min((value / max) * 100, 100);
+  setTimeout(() => {
+    progressFill.style.width = percentage + '%';
+  }, 100);
 }
 
 /* GENERATE CHARTS WITH DATABASE DATA */
@@ -78,7 +104,7 @@ function updateStatusAndAreaCharts(insightsData) {
   const topAreas = insightsData.top_problem_areas || [];
   const statusCounts = buildStatusCounts(breakdown);
 
-  createStatusChart(statusCounts.pending, statusCounts.resolved, statusCounts.rejected);
+  createStatusChart(statusCounts.pending, statusCounts.inProgress, statusCounts.resolved, statusCounts.rejected);
 
   const areaLabels = topAreas.map(area => area.zone || 'Unknown');
   const areaCounts = topAreas.map(area => area.complaints || 0);
@@ -88,29 +114,30 @@ function updateStatusAndAreaCharts(insightsData) {
 }
 
 function buildStatusCounts(breakdown) {
-  const counts = { pending: 0, resolved: 0, rejected: 0 };
+  const counts = { pending: 0, inProgress: 0, resolved: 0, rejected: 0 };
   breakdown.forEach(item => {
     const status = (item.status || '').toLowerCase();
     const count = Number(item.count || 0);
     if (status === 'resolved') counts.resolved += count;
     else if (status === 'rejected' || status === 'cancelled') counts.rejected += count;
-    else if (status === 'pending' || status === 'in progress') counts.pending += count;
+    else if (status === 'in progress') counts.inProgress += count;
+    else if (status === 'pending') counts.pending += count;
   });
   return counts;
 }
 
 /* STATUS CHART - DOUGHNUT */
-function createStatusChart(pending, resolved, rejected) {
+function createStatusChart(pending, inProgress, resolved, rejected) {
   const statusCtx = document.getElementById("statusChart");
   if (statusChart) statusChart.destroy();
   
   statusChart = new Chart(statusCtx, {
     type: 'doughnut',
     data: {
-      labels: ['Pending', 'Resolved', 'Rejected'],
+      labels: ['Pending', 'In Progress', 'Resolved', 'Rejected'],
       datasets: [{
-        data: [pending, resolved, rejected],
-        backgroundColor: ['#fde047','#4ade80','#f87171']
+        data: [pending, inProgress, resolved, rejected],
+        backgroundColor: ['#fbbf24','#3b82f6','#4ade80','#ef4444']
       }]
     },
     options: {
@@ -452,7 +479,9 @@ window.addEventListener("scroll", () => {
 /* LIVE COMPLAINTS FEED */
 async function loadLiveComplaints() {
   try {
-    const response = await fetch(`${API_BASE}/get-all-complaints.php`);
+    const response = await fetch(`${API_BASE}/get-all-complaints.php?ts=${Date.now()}`, {
+      cache: 'no-store'
+    });
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -521,21 +550,88 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19
 }).addTo(liveMap);
 
-// Custom marker icon with pulse animation
-const customIcon = L.divIcon({
-  className: 'custom-marker',
-  html: '<div style="background: linear-gradient(135deg, #38bdf8, #0ea5e9); width: 30px; height: 30px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.9); box-shadow: 0 4px 12px rgba(56, 189, 248, 0.6); animation: pulse-marker 2s infinite;"></div>',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15]
-});
+// Custom marker icons with status-based colors
+function getMarkerIcon(status) {
+  const statusMap = {
+    'pending': { color: '#fbbf24', shadow: 'rgba(251, 191, 36, 0.6)' },
+    'in progress': { color: '#3b82f6', shadow: 'rgba(59, 130, 246, 0.6)' },
+    'resolved': { color: '#4ade80', shadow: 'rgba(74, 222, 128, 0.6)' },
+    'rejected': { color: '#ef4444', shadow: 'rgba(239, 68, 68, 0.6)' },
+    'cancelled': { color: '#6b7280', shadow: 'rgba(107, 114, 128, 0.6)' }
+  };
+
+  const statusNorm = (status || '').toLowerCase();
+  const config = statusMap[statusNorm] || statusMap['pending'];
+
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="position: relative; width: 40px; height: 50px;">
+      <svg viewBox="0 0 40 50" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 4px 12px ${config.shadow}); animation: pulse-marker 2s infinite;">
+        <path d="M 20 5 C 11.7 5 5 11.7 5 20 C 5 32 20 45 20 45 C 20 45 35 32 35 20 C 35 11.7 28.3 5 20 5 Z" fill="${config.color}" stroke="rgba(255,255,255,0.9)" stroke-width="2"/>
+        <circle cx="20" cy="20" r="8" fill="rgba(255,255,255,0.9)"/>
+      </svg>
+    </div>`,
+    iconSize: [40, 50],
+    iconAnchor: [20, 50]
+  });
+}
 
 // Store markers for dynamic updates
 const mapMarkers = [];
 
+function getFallbackCoords(complaint, order) {
+  const center = liveMap.getCenter();
+  const seed = String(
+    complaint.complaintId ||
+    complaint.complaint_id ||
+    complaint.id ||
+    order
+  );
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) | 0;
+  }
+  const angle = (Math.abs(hash) % 360) * (Math.PI / 180);
+  const ring = (Math.abs(hash) % 5) + 1;
+  const step = 0.002;
+  const radius = step * ring;
+  return {
+    lat: center.lat + Math.cos(angle) * radius,
+    lng: center.lng + Math.sin(angle) * radius
+  };
+}
+
+function updateMapStatus(totalPending, withCoords, missingCoords) {
+  const container = document.querySelector('.map-container');
+  if (!container) return;
+
+  let statusEl = document.getElementById('map-status');
+  if (!statusEl) {
+    statusEl = document.createElement('div');
+    statusEl.id = 'map-status';
+    statusEl.style.position = 'absolute';
+    statusEl.style.left = '12px';
+    statusEl.style.bottom = '12px';
+    statusEl.style.zIndex = '999';
+    statusEl.style.padding = '6px 10px';
+    statusEl.style.fontSize = '12px';
+    statusEl.style.borderRadius = '8px';
+    statusEl.style.background = 'rgba(2, 6, 23, 0.65)';
+    statusEl.style.color = 'rgba(255, 255, 255, 0.85)';
+    statusEl.style.border = '1px solid rgba(56, 189, 248, 0.2)';
+    statusEl.style.backdropFilter = 'blur(6px)';
+    container.appendChild(statusEl);
+  }
+
+  statusEl.textContent = `Pending: ${totalPending} | On map: ${withCoords} | Missing coords: ${missingCoords}`;
+}
+
 // Function to load complaints on map
 async function loadComplaintsOnMap() {
   try {
-    const response = await fetch(`${API_BASE}/get-all-complaints.php`);
+    const response = await fetch(`${API_BASE}/get-all-complaints.php?ts=${Date.now()}`, {
+      cache: 'no-store'
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -548,29 +644,94 @@ async function loadComplaintsOnMap() {
       mapMarkers.forEach(marker => liveMap.removeLayer(marker));
       mapMarkers.length = 0;
 
+      let totalPending = 0;
+      let pendingWithCoords = 0;
+      let pendingMissingCoords = 0;
+
+      const coordCounts = new Map();
+
       data.complaints.forEach(complaint => {
-        const lat = Number(complaint.latitude ?? complaint.lat);
-        const lng = Number(complaint.longitude ?? complaint.lng);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+        // Only show pending complaints
+        const status = complaint.status || complaint.current_status || 'Pending';
+        const statusNorm = String(status).toLowerCase().trim();
+        const isPending = !statusNorm || statusNorm.includes('pending') || statusNorm === 'new' || statusNorm === 'open';
+        if (!isPending) return;
+
+        totalPending += 1;
+
+        let lat = Number(complaint.latitude ?? complaint.lat);
+        let lng = Number(complaint.longitude ?? complaint.lng);
+          let isApprox = false;
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            pendingMissingCoords += 1;
+            const fallback = getFallbackCoords(complaint, pendingMissingCoords);
+            lat = fallback.lat;
+            lng = fallback.lng;
+            isApprox = true;
+          }
+
+          pendingWithCoords += 1;
+
+        const key = `${lat.toFixed(5)},${lng.toFixed(5)}`;
+        const count = coordCounts.get(key) || 0;
+        coordCounts.set(key, count + 1);
+        if (count > 0) {
+          const step = 0.0003;
+          const ring = Math.floor(count / 8) + 1;
+          const angle = (count % 8) * (Math.PI / 4);
+          lat += Math.cos(angle) * step * ring;
+          lng += Math.sin(angle) * step * ring;
+        }
 
         const title = complaint.title || complaint.category || 'Complaint';
         const location = complaint.location || complaint.zone || 'Unknown';
+        const statusColor = getStatusColor(status);
+        const statusIcon = getStatusIcon(status);
 
-        const marker = L.marker([lat, lng], { icon: customIcon })
+        const approxNote = isApprox
+          ? '<br><span style="font-size: 11px; color: rgba(255,255,255,0.6);">Approx location</span>'
+          : '';
+
+        const marker = L.marker([lat, lng], { icon: getMarkerIcon(status) })
           .addTo(liveMap)
           .bindPopup(`
             <div style="padding: 8px; font-family: 'Inter', sans-serif;">
               <strong style="font-size: 16px; color: #38bdf8;">${title}</strong><br>
-              <span style="font-size: 13px; color: rgba(255,255,255,0.8);">${location}</span>
+              <span style="font-size: 13px; color: rgba(255,255,255,0.8);">📍 ${location}</span><br>
+              <span style="font-size: 12px; color: ${statusColor}; font-weight: 600;">${statusIcon} ${status}</span>${approxNote}
             </div>
           `);
 
         mapMarkers.push(marker);
       });
+
+      updateMapStatus(totalPending, pendingWithCoords, pendingMissingCoords);
     }
   } catch (error) {
     console.error('Error loading map data:', error);
   }
+}
+
+function getStatusColor(status) {
+  const statusMap = {
+    'pending': '#fbbf24',
+    'in progress': '#3b82f6',
+    'resolved': '#4ade80',
+    'rejected': '#ef4444',
+    'cancelled': '#6b7280'
+  };
+  return statusMap[(status || '').toLowerCase()] || '#fbbf24';
+}
+
+function getStatusIcon(status) {
+  const statusMap = {
+    'pending': '⏳',
+    'in progress': '🔄',
+    'resolved': '✅',
+    'rejected': '❌',
+    'cancelled': '🚫'
+  };
+  return statusMap[(status || '').toLowerCase()] || '🟡';
 }
 
 // Enable scroll zoom when user clicks on map
@@ -580,28 +741,39 @@ const mapOverlay = document.querySelector('.map-scroll-overlay');
 let mapActive = false;
 
 if (mapElement && mapOverlay) {
+  // Show overlay when hovering
   mapElement.addEventListener('mouseenter', () => {
     if (!mapActive) {
       mapOverlay.classList.add('active');
     }
   });
 
+  // Hide overlay when leaving
   mapElement.addEventListener('mouseleave', () => {
-    mapOverlay.classList.remove('active');
+    if (!mapActive) {
+      mapOverlay.classList.remove('active');
+    }
   });
 
-  const enableScrollZoom = () => {
-    mapActive = true;
-    liveMap.scrollWheelZoom.enable();
-    mapElement.classList.add('scroll-enabled');
-    mapOverlay.classList.remove('active');
+  // Enable zoom on overlay click
+  const enableZoom = (e) => {
+    if (e.target === mapOverlay || mapOverlay.contains(e.target)) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!mapActive) {
+        mapActive = true;
+        liveMap.scrollWheelZoom.enable();
+        mapElement.classList.add('scroll-enabled');
+        mapOverlay.classList.remove('active');
+      }
+    }
   };
 
-  mapOverlay.addEventListener('click', enableScrollZoom);
-  mapElement.addEventListener('click', enableScrollZoom);
+  mapOverlay.addEventListener('click', enableZoom);
 
+  // Disable zoom when clicking outside map
   document.addEventListener('click', (e) => {
-    if (!mapElement.contains(e.target)) {
+    if (!mapElement.contains(e.target) && !mapOverlay.contains(e.target) && mapActive) {
       mapActive = false;
       liveMap.scrollWheelZoom.disable();
       mapElement.classList.remove('scroll-enabled');

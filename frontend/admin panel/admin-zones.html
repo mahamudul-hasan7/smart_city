@@ -14,7 +14,7 @@
 <header class="global-header">
   <div class="header-left">
     <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
-    <a href="../index/index.html" class="logo-text">Smart<span>City</span></a>
+    <a href="admin-dashboard.html" class="logo-text">Smart<span>City</span></a>
   </div>
   <div class="header-right">
     <span class="page-title">Zone Management</span>
@@ -56,13 +56,36 @@
       </div>
     </section>
 
+    <!-- Delete Confirm Modal -->
+    <div class="zone-modal-overlay" id="deleteZoneModalOverlay" style="display:none;">
+      <div class="zone-modal">
+        <div class="zone-modal-header">
+          <h2><i class="fas fa-trash"></i> Delete Zone</h2>
+          <button class="zone-modal-close" id="closeDeleteZoneModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="zone-modal-body">
+          <p>Are you sure you want to delete <strong id="deleteZoneName" style="color:#ff4d4d;"></strong>?
+            <br><span>This action cannot be undone.</span>
+          </p>
+          <div class="zone-modal-actions">
+            <button type="button" class="btn-cancel" id="cancelDeleteZoneModal">Cancel</button>
+            <button type="button" class="btn-delete-confirm" id="confirmDeleteZoneBtn"><i class="fas fa-trash"></i> Yes, Delete</button>
+          </div>
+          <div id="deleteZoneStatusMsg" class="zone-status-msg"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- TABLE -->
     <section class="table-box">
       <div class="table-header">
         <h2>Zone List</h2>
-        <button class="btn-primary" onclick="window.location.href='admin-add-zone.html'">
-          <i class="fas fa-plus"></i> Add Zone
-        </button>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <button class="btn-edit-mode" id="editModeToggle"><i class="fas fa-pen-to-square"></i> Edit Mode</button>
+          <button class="btn-primary" onclick="window.location.href='admin-add-zone.html'">
+            <i class="fas fa-plus"></i> Add Zone
+          </button>
+        </div>
       </div>
 
       <table>
@@ -72,6 +95,7 @@
             <th>Zone Name</th>
             <th>City</th>
             <th>Area Description</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="zoneTableBody">

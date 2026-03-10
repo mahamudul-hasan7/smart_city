@@ -26,9 +26,9 @@ try {
         $query = "SELECT 
             s.user_id,
             CONCAT('S-', s.user_id) as staff_id,
-            s.full_name,
+            CONCAT(COALESCE(s.first_name, ''), CASE WHEN s.last_name IS NULL OR s.last_name = '' THEN '' ELSE ' ' END, COALESCE(s.last_name, '')) as full_name,
             s.designation,
-            s.email,
+            u.email,
             s.phone_no,
             s.status,
             s.dept_id,
@@ -37,6 +37,7 @@ try {
             s.joining_date,
             COUNT(sa.assignment_id) as assigned_complaints
         FROM Staff s
+        LEFT JOIN user u ON s.user_id = u.user_id
         LEFT JOIN Zone z ON s.zone_id = z.zone_id
         LEFT JOIN Department d ON s.dept_id = d.dept_id
         LEFT JOIN StaffAssignment sa ON s.user_id = sa.staff_id
@@ -46,9 +47,9 @@ try {
         $query = "SELECT 
             s.user_id,
             CONCAT('S-', s.user_id) as staff_id,
-            s.full_name,
+            CONCAT(COALESCE(s.first_name, ''), CASE WHEN s.last_name IS NULL OR s.last_name = '' THEN '' ELSE ' ' END, COALESCE(s.last_name, '')) as full_name,
             s.designation,
-            s.email,
+            u.email,
             s.phone_no,
             s.status,
             s.dept_id,
@@ -57,6 +58,7 @@ try {
             s.joining_date,
             0 as assigned_complaints
         FROM Staff s
+        LEFT JOIN user u ON s.user_id = u.user_id
         LEFT JOIN Zone z ON s.zone_id = z.zone_id
         LEFT JOIN Department d ON s.dept_id = d.dept_id
         ORDER BY s.user_id DESC";
@@ -64,15 +66,16 @@ try {
         $query = "SELECT 
             s.user_id,
             CONCAT('S-', s.user_id) as staff_id,
-            s.full_name,
+            CONCAT(COALESCE(s.first_name, ''), CASE WHEN s.last_name IS NULL OR s.last_name = '' THEN '' ELSE ' ' END, COALESCE(s.last_name, '')) as full_name,
             s.designation,
-            s.email,
+            u.email,
             s.phone_no,
             s.status,
             z.name as zone_name,
             s.joining_date,
             COUNT(sa.assignment_id) as assigned_complaints
         FROM Staff s
+        LEFT JOIN user u ON s.user_id = u.user_id
         LEFT JOIN Zone z ON s.zone_id = z.zone_id
         LEFT JOIN StaffAssignment sa ON s.user_id = sa.staff_id
         GROUP BY s.user_id
@@ -81,15 +84,16 @@ try {
         $query = "SELECT 
             s.user_id,
             CONCAT('S-', s.user_id) as staff_id,
-            s.full_name,
+            CONCAT(COALESCE(s.first_name, ''), CASE WHEN s.last_name IS NULL OR s.last_name = '' THEN '' ELSE ' ' END, COALESCE(s.last_name, '')) as full_name,
             s.designation,
-            s.email,
+            u.email,
             s.phone_no,
             s.status,
             z.name as zone_name,
             s.joining_date,
             0 as assigned_complaints
         FROM Staff s
+        LEFT JOIN user u ON s.user_id = u.user_id
         LEFT JOIN Zone z ON s.zone_id = z.zone_id
         ORDER BY s.user_id DESC";
     }

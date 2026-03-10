@@ -50,7 +50,7 @@ try {
         exit(json_encode(['success' => false, 'errors' => $errors]));
     }
     
-    $status = 'pending';
+    $status = 'Pending';
     $created_date = date('Y-m-d H:i:s');
     
     // Check table structure first
@@ -81,8 +81,8 @@ try {
     
     // Determine which structure to use
     if (in_array('user_id', $columns) && in_array('title', $columns)) {
-        // Simple structure: user_id, title, description, category, location, status, created_date
-        $sql = "INSERT INTO $table_name (user_id, title, description, category, location, status, created_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        // Simple structure: user_id, title, description, category, location, created_date
+        $sql = "INSERT INTO $table_name (user_id, title, description, category, location, created_date) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             http_response_code(500);
@@ -92,7 +92,7 @@ try {
                 'error' => $conn->error
             ]));
         }
-        $stmt->bind_param('issssss', $user_id, $title, $description, $category, $location, $status, $created_date);
+        $stmt->bind_param('isssss', $user_id, $title, $description, $category, $location, $created_date);
     } else if (in_array('citizen_id', $columns) && in_array('type', $columns)) {
         // Complex structure: citizen_id, type, description, location_city, location_area, location_street, current_status, submitted_date
         // Map user_id to citizen_id (assuming they're the same)
@@ -158,6 +158,16 @@ try {
     
     if ($stmt->execute()) {
         $complaint_id = $conn->insert_id;
+
+        $status_stmt = $conn->prepare("INSERT INTO complaint_status (complaint_id, status_name, remarks, updated_by, status_date) VALUES (?, ?, ?, ?, NOW())");
+        if ($status_stmt) {
+            $remarks = 'Complaint submitted by citizen';
+            $updated_by = 'Citizen ID: ' . $user_id;
+            $status_stmt->bind_param('isss', $complaint_id, $status, $remarks, $updated_by);
+            $status_stmt->execute();
+            $status_stmt->close();
+        }
+
         http_response_code(201);
         exit(json_encode([
             'success' => true,

@@ -80,10 +80,10 @@ try {
         
         $user_id = $conn->insert_id;
         
-        // 2) Insert into citizen table
-        $sql = "INSERT INTO citizen (user_id, name, nid, dob, email, password) VALUES (?, ?, ?, ?, ?, ?)";
+        // 2) Insert into citizen table (normalized schema)
+        $sql = "INSERT INTO citizen (user_id, nid, dob) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param('isssss', $user_id, $name, $nid, $dob, $email, $hashed);
+        $stmt->bind_param('iss', $user_id, $nid, $dob);
         
         if (!$stmt->execute()) {
             throw new Exception('Failed to insert into citizen table: ' . $stmt->error);

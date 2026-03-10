@@ -21,11 +21,25 @@ try {
     
     // Get complaints for this user
     $stmt = $conn->prepare("SELECT 
-        complaint_id, citizen_id, description, type, 
-        CONCAT(location_city, ', ', location_area, ', ', location_street) as location,
-        current_status, submitted_date, priority_level
+        c.complaint_id,
+        c.user_id,
+        c.description,
+        c.category,
+        c.location,
+        COALESCE(cs_latest.status_name, 'Pending') as current_status,
+        c.created_date
         FROM complaint 
-        WHERE citizen_id = ?
+        c
+        LEFT JOIN (
+            SELECT cs1.complaint_id, cs1.status_name
+            FROM complaint_status cs1
+            INNER JOIN (
+                SELECT complaint_id, MAX(status_id) AS latest_status_id
+                FROM complaint_status
+                GROUP BY complaint_id
+            ) latest ON latest.latest_status_id = cs1.status_id
+        ) cs_latest ON c.complaint_id = cs_latest.complaint_id
+        WHERE c.user_id = ?
         LIMIT 10");
     $stmt->bind_param('i', $test_user_id);
     $stmt->execute();

@@ -97,6 +97,7 @@ try {
     
     $stmt->bind_param('ss', $zone, $zone_lower);
     $stmt->execute();
+    $result = $stmt->get_result();
     // Check if zone exists
     if ($result->num_rows === 0) {
         // Debug: Get all available zones
@@ -136,22 +137,34 @@ try {
         exit();
     }
     
-    // Check if user exists
-    $stmt = $conn->prepare("SELECT user_id FROM user WHERE user_id = ?");
-    $stmt->bind_param('i', $user_id);
-    $stmt->execute();
-    
-    if ($stmt->get_result()->num_rows > 0) {
-        ob_clean();
-        http_response_code(409);
-        echo json_encode(['success' => false, 'message' => 'Staff ID already exists']);
-        exit();
+    // If user_id already exists, find next available one
+    while (true) {
+        $stmt = $conn->prepare("SELECT user_id FROM user WHERE user_id = ?");
+        $stmt->bind_param('i', $user_id);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows === 0) break;
+        $user_id++;
     }
+    $staff_id = (string) $user_id;
     
     // Split name
     $name_parts = explode(' ', $full_name, 2);
     $first_name = $name_parts[0];
     $last_name = isset($name_parts[1]) ? $name_parts[1] : '';
+
+    $dept_id = null;
+    if (!empty($department)) {
+        $deptLookup = $conn->prepare("SELECT dept_id FROM department WHERE name = ? LIMIT 1");
+        if ($deptLookup) {
+            $deptLookup->bind_param('s', $department);
+            $deptLookup->execute();
+            $deptResult = $deptLookup->get_result();
+            if ($deptResult && $deptResult->num_rows > 0) {
+                $dept_id = (int)$deptResult->fetch_assoc()['dept_id'];
+            }
+            $deptLookup->close();
+        }
+    }
     
     // Hash password
     $password = password_hash('staff123', PASSWORD_BCRYPT);
@@ -172,8 +185,8 @@ try {
     }
     
     // Insert into staff
-    $stmt = $conn->prepare("INSERT INTO staff (user_id, first_name, last_name, full_name, designation, email, joining_date, status, phone_no, zone_id) VALUES (?, ?, ?, ?, ?, ?, CURDATE(), ?, ?, ?)");
-    $stmt->bind_param('isssssssi', $user_id, $first_name, $last_name, $full_name, $designation, $email, $status, $phone, $zone_id);
+    $stmt = $conn->prepare("INSERT INTO staff (user_id, first_name, last_name, designation, joining_date, status, phone_no, zone_id, dept_id) VALUES (?, ?, ?, ?, CURDATE(), ?, ?, ?, ?)");
+    $stmt->bind_param('isssssii', $user_id, $first_name, $last_name, $designation, $status, $phone, $zone_id, $dept_id);
     
     if (!$stmt->execute()) {
         $conn->rollback();

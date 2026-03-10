@@ -21,18 +21,29 @@ try {
         c.complaint_id,
         c.category as type,
         c.description,
-        c.status as current_status,
+        COALESCE(cs_latest.status_name, 'Pending') as current_status,
         c.created_date as submitted_date,
         c.user_id,
         c.location,
-        sa.department_id,
+        c.latitude,
+        c.longitude,
+        s.dept_id as department_id,
         sa.staff_id,
         d.name as dept_name,
-        s.full_name as staff_name
+        CONCAT(COALESCE(s.first_name, ''), CASE WHEN s.last_name IS NULL OR s.last_name = '' THEN '' ELSE ' ' END, COALESCE(s.last_name, '')) as staff_name
     FROM complaint c
     LEFT JOIN staffassignment sa ON c.complaint_id = sa.complaint_id
-    LEFT JOIN department d ON sa.department_id = d.dept_id
     LEFT JOIN staff s ON sa.staff_id = s.user_id
+    LEFT JOIN department d ON s.dept_id = d.dept_id
+    LEFT JOIN (
+        SELECT cs1.complaint_id, cs1.status_name
+        FROM complaint_status cs1
+        INNER JOIN (
+            SELECT complaint_id, MAX(status_id) AS latest_status_id
+            FROM complaint_status
+            GROUP BY complaint_id
+        ) latest ON latest.latest_status_id = cs1.status_id
+    ) cs_latest ON c.complaint_id = cs_latest.complaint_id
     ORDER BY c.created_date DESC";
     
     $result = $conn->query($query);
@@ -52,6 +63,10 @@ try {
             'user_id' => $row['user_id'],
             'location' => $row['location'] ?? 'Unknown',
             'area' => $row['location'] ?? 'Unknown',
+            'latitude' => $row['latitude'] ?? null,
+            'longitude' => $row['longitude'] ?? null,
+            'lat' => $row['latitude'] ?? null,
+            'lng' => $row['longitude'] ?? null,
             'dept_id' => $row['department_id'],
             'dept_name' => $row['dept_name'] ?? 'Unassigned',
             'department' => $row['dept_name'] ?? 'Unassigned',

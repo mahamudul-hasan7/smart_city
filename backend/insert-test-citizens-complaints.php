@@ -67,9 +67,15 @@ foreach ($citizens as $citizen) {
             $user_id = $stmt->insert_id;
             $citizen_ids[] = $user_id;
             
-            // Also insert into citizen table
-            $citizen_stmt = $conn->prepare("INSERT INTO citizen (name, email, password) VALUES (?, ?, ?)");
-            $citizen_stmt->bind_param("sss", $name, $email, $hashed_password);
+            // Also insert into citizen table (normalized fields)
+            $nid = 'NID-' . $user_id;
+            $dob = '2000-01-01';
+            $gender = null;
+            $street = '';
+            $area = '';
+            $city = 'Dhaka';
+            $citizen_stmt = $conn->prepare("INSERT INTO citizen (user_id, nid, dob, gender, street, area, city) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $citizen_stmt->bind_param("issssss", $user_id, $nid, $dob, $gender, $street, $area, $city);
             
             if ($citizen_stmt->execute()) {
                 echo "<div class='success'>✓ Inserted: <strong>$name</strong> (User ID: $user_id) | Citizen ID: " . $citizen_stmt->insert_id . "</div>";
@@ -138,10 +144,20 @@ foreach ($citizen_ids as $idx => $citizen_id) {
         
         $submitted_date = date('Y-m-d', strtotime("$days_ago days"));
         
-        $stmt = $conn->prepare("INSERT INTO complaint (user_id, title, description, category, status, created_date) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isssss", $citizen_id, $type, $description, $type, $status, $submitted_date);
+        $stmt = $conn->prepare("INSERT INTO complaint (user_id, title, description, category, location, created_date) VALUES (?, ?, ?, ?, ?, ?)");
+        $location = "Zone $zone";
+        $stmt->bind_param("isssss", $citizen_id, $type, $description, $type, $location, $submitted_date);
         
         if ($stmt->execute()) {
+            $complaint_id = $conn->insert_id;
+            $remarks = 'Inserted by insert-test-citizens-complaints.php';
+            $updated_by = 'system';
+            $status_stmt = $conn->prepare("INSERT INTO complaint_status (complaint_id, status_name, remarks, status_date, updated_by) VALUES (?, ?, ?, ?, ?)");
+            if ($status_stmt) {
+                $status_stmt->bind_param('issss', $complaint_id, $status, $remarks, $submitted_date, $updated_by);
+                $status_stmt->execute();
+                $status_stmt->close();
+            }
             echo "<div class='success' style='margin-left: 20px; font-size: 0.9em;'>✓ $type | Status: $status | Date: $submitted_date</div>";
             $complaint_count++;
             $total_complaints++;

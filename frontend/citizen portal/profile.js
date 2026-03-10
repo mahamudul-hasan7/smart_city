@@ -95,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadProfileData();
   loadRecentComplaints();
   loadComplaintStatistics();
-  loadLoginHistory();
   // loadAchievementBadges() and loadCommunityImpact() are now called from loadComplaintStatistics()
 
   // Logout
@@ -437,49 +436,18 @@ async function loadComplaintStatistics() {
       document.getElementById("progressComplaints").textContent = progress;
       document.getElementById("resolvedComplaints").textContent = resolved;
       
+      // Update new profile header stats
+      const totalCountEl = document.getElementById("totalComplaintsCount");
+      const resolvedCountEl = document.getElementById("resolvedComplaintsCount");
+      if (totalCountEl) totalCountEl.textContent = total;
+      if (resolvedCountEl) resolvedCountEl.textContent = resolved;
+      
       // Load badges and impact after stats are updated
       loadAchievementBadges();
       loadCommunityImpact();
     }
   } catch (err) {
     console.error('Error loading statistics:', err);
-  }
-}
-
-async function loadLoginHistory() {
-  try {
-    const response = await fetch(`http://127.0.0.1/Smart_City/backend/get-login-history.php?user_id=${currentUser.id}`);
-    const data = await response.json();
-
-    const historyList = document.getElementById("loginHistory");
-    
-    if (data.success && data.logins && data.logins.length > 0) {
-      // Update last login badge (most recent)
-      const lastLoginEl = document.getElementById("lastLogin");
-      if (lastLoginEl) {
-        const last = data.logins[0];
-        const ts = new Date(last.login_time);
-        lastLoginEl.textContent = `Last login: ${ts.toLocaleString()}`;
-      }
-
-      // Show only last 3 login activities
-      const recentLogins = data.logins.slice(0, 3);
-      
-      historyList.innerHTML = recentLogins.map(login => `
-        <div class="history-item">
-          <div class="history-time">${new Date(login.login_time).toLocaleString()}</div>
-          <div class="history-meta">
-            <span>IP: ${login.ip_address || 'N/A'}</span>
-            <span>${login.device || 'Unknown Device'}</span>
-          </div>
-        </div>
-      `).join('');
-    } else {
-      historyList.innerHTML = '<p style="opacity: 0.6; text-align: center; padding: 20px;">No login history</p>';
-    }
-  } catch (err) {
-    console.error('Error loading login history:', err);
-    document.getElementById("loginHistory").innerHTML = '<p style="opacity: 0.6;">Failed to load login history</p>';
   }
 }
 
@@ -584,7 +552,7 @@ function loadNotificationPreferences() {
 // Handle Account Deletion
 async function handleDeleteAccount() {
   // First confirmation
-  const firstConfirm = confirm(" WARNING: This action cannot be undone!\n\nDeleting your account will permanently remove:\n Your profile information\n All your complaints\n Login history\n All associated data\n\nAre you absolutely sure you want to proceed?");
+  const firstConfirm = confirm(" WARNING: This action cannot be undone!\n\nDeleting your account will permanently remove:\n Your profile information\n All your complaints\n All associated data\n\nAre you absolutely sure you want to proceed?");
   
   if (!firstConfirm) {
     return;

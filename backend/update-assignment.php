@@ -34,15 +34,14 @@ try {
     }
 
     $complaint_id = $data['complaint_id'] ?? null;
-    $department_id = $data['department_id'] ?? null;
     $staff_id = $data['staff_id'] ?? null;
     $status = $data['status'] ?? null;
     $remarks = $data['remarks'] ?? null;
 
     // Validate required fields
-    if (!$complaint_id || !$department_id) {
+    if (!$complaint_id) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Missing required fields: complaint_id, department_id']);
+        echo json_encode(['success' => false, 'message' => 'Missing required field: complaint_id']);
         exit();
     }
 
@@ -57,28 +56,17 @@ try {
     // Start transaction
     $conn->begin_transaction();
 
-    // Update complaint with new department and status
-    if ($status) {
-        $update_sql = "UPDATE complaint SET status = ? WHERE complaint_id = ?";
-        $stmt = $conn->prepare($update_sql);
-        if (!$stmt) {
-            throw new Exception('Failed to prepare statement: ' . $conn->error);
-        }
-        $stmt->bind_param('si', $status, $complaint_id);
-    } else {
-        // Don't update status if not provided - only update assignment
-        $update_sql = "UPDATE complaint SET status = status WHERE complaint_id = ?";
-        $stmt = $conn->prepare($update_sql);
-        if (!$stmt) {
-            throw new Exception('Failed to prepare statement: ' . $conn->error);
-        }
-        $stmt->bind_param('i', $complaint_id);
+    $checkComplaintStmt = $conn->prepare("SELECT complaint_id FROM complaint WHERE complaint_id = ? LIMIT 1");
+    if (!$checkComplaintStmt) {
+        throw new Exception('Failed to prepare complaint check: ' . $conn->error);
     }
-
-    if (!$stmt->execute()) {
-        throw new Exception('Failed to update complaint: ' . $stmt->error);
+    $checkComplaintStmt->bind_param('i', $complaint_id);
+    $checkComplaintStmt->execute();
+    $complaintResult = $checkComplaintStmt->get_result();
+    if (!$complaintResult || $complaintResult->num_rows === 0) {
+        throw new Exception('Complaint not found');
     }
-    $stmt->close();
+    $checkComplaintStmt->close();
 
     // If status is being updated, log to complaint_status table
     if ($status) {
@@ -115,13 +103,13 @@ try {
         if ($exists) {
             // Update existing assignment
             $update_assign_sql = "UPDATE staffassignment 
-                                 SET staff_id = ?, department_id = ?, notes = ?
+                                 SET staff_id = ?, notes = ?
                                  WHERE complaint_id = ?";
             $stmt = $conn->prepare($update_assign_sql);
             if (!$stmt) {
                 throw new Exception('Failed to prepare assignment update: ' . $conn->error);
             }
-            $stmt->bind_param('iisi', $staff_id, $department_id, $remarks, $complaint_id);
+            $stmt->bind_param('isi', $staff_id, $remarks, $complaint_id);
             
             if (!$stmt->execute()) {
                 throw new Exception('Failed to update assignment: ' . $stmt->error);
@@ -129,13 +117,13 @@ try {
             $stmt->close();
         } else {
             // Insert new assignment
-            $assign_sql = "INSERT INTO staffassignment (staff_id, complaint_id, department_id, assigned_date, status, notes) 
-                           VALUES (?, ?, ?, NOW(), 'Assigned', ?)";
+            $assign_sql = "INSERT INTO staffassignment (staff_id, complaint_id, assigned_date, status, notes) 
+                           VALUES (?, ?, NOW(), 'Assigned', ?)";
             $stmt = $conn->prepare($assign_sql);
             if (!$stmt) {
                 throw new Exception('Failed to prepare assignment insert: ' . $conn->error);
             }
-            $stmt->bind_param('iiis', $staff_id, $complaint_id, $department_id, $remarks);
+            $stmt->bind_param('iis', $staff_id, $complaint_id, $remarks);
             
             if (!$stmt->execute()) {
                 throw new Exception('Failed to create assignment: ' . $stmt->error);
@@ -152,7 +140,6 @@ try {
         'success' => true,
         'message' => 'Complaint assignment and status updated successfully',
         'complaint_id' => $complaint_id,
-        'department_id' => $department_id,
         'status' => $status
     ]);
 

@@ -46,15 +46,26 @@ try {
     }
     
     // Check if complaint exists
-    $check = $conn->query("SELECT complaint_id, status FROM complaint WHERE complaint_id = $complaint_id");
+    $check = $conn->query("SELECT complaint_id FROM complaint WHERE complaint_id = $complaint_id");
     if ($check->num_rows === 0) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Complaint not found']);
         exit();
     }
-    
-    $complaint = $check->fetch_assoc();
-    $old_status = $complaint['status'];
+
+    $old_status = 'Pending';
+    $oldStatusSql = "SELECT status_name FROM complaint_status WHERE complaint_id = ? ORDER BY status_date DESC, status_id DESC LIMIT 1";
+    $oldStmt = $conn->prepare($oldStatusSql);
+    if ($oldStmt) {
+        $oldStmt->bind_param('i', $complaint_id);
+        $oldStmt->execute();
+        $oldResult = $oldStmt->get_result();
+        if ($oldResult && $oldResult->num_rows > 0) {
+            $oldRow = $oldResult->fetch_assoc();
+            $old_status = $oldRow['status_name'] ?? 'Pending';
+        }
+        $oldStmt->close();
+    }
 
     // Transition guards
     $old_lower = strtolower($old_status);
@@ -77,23 +88,7 @@ try {
         }
     }
     
-    // Update complaint status
-    $update_query = "UPDATE complaint SET status = ? WHERE complaint_id = ?";
-    $stmt = $conn->prepare($update_query);
-    
-    if (!$stmt) {
-        throw new Exception($conn->error);
-    }
-    
-    $stmt->bind_param("si", $new_status, $complaint_id);
-    
-    if (!$stmt->execute()) {
-        throw new Exception($stmt->error);
-    }
-    
-    $stmt->close();
-    
-    // Log status update (if complaint_status table exists)
+    // Log status update to complaint_status (source of truth)
     // Build remarks with optional stage/progress
     $remarks = $notes;
     if (!empty($stage) || is_numeric($progress_percent)) {
@@ -104,7 +99,7 @@ try {
         $remarks = trim($prefix . (empty($notes) ? '' : " | Note: $notes"));
     }
 
-    $log_query = "INSERT INTO complaint_status (complaint_id, status_name, remarks, updated_by, status_date) 
+    $log_query = "INSERT INTO complaint_status (complaint_id, status_name, remarks, updated_by, status_date)
                   VALUES (?, ?, ?, ?, NOW())";
     $log_stmt = $conn->prepare($log_query);
     

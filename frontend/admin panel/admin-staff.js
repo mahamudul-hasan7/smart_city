@@ -194,7 +194,6 @@ function renderStaffTable(staffList, departments = cachedDepartments, zones = ca
       <option value="On Duty" ${staff.status === 'On Duty' ? 'selected' : ''}>On Duty</option>
       <option value="On Leave" ${staff.status === 'On Leave' ? 'selected' : ''}>On Leave</option>
     `;
-    
     return `
       <tr>
         <td>${staff.staff_id}</td>
@@ -220,11 +219,78 @@ function renderStaffTable(staffList, departments = cachedDepartments, zones = ca
           <span class="contact-icon"><i class="fas fa-phone"></i></span> ${staff.phone}<br>
           <span class="contact-icon"><i class="fas fa-envelope"></i></span> ${staff.email}
         </td>
+        <td>
+          <button class="delete-staff-btn" data-user-id="${staff.user_id}" title="Delete Staff"><i class="fas fa-trash"></i></button>
+        </td>
       </tr>
     `;
   }).join('');
 
   tbody.innerHTML = rows;
+  // Modal elements
+  const modal = document.getElementById('deleteConfirmModal');
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+  const cancelBtn = document.getElementById('cancelDeleteBtn');
+  let pendingDeleteUserId = null;
+
+  tbody.querySelectorAll('.delete-staff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const userId = btn.dataset.userId;
+      if (!userId) return;
+      pendingDeleteUserId = userId;
+      // Store the row element for animation
+      const row = btn.closest('tr');
+      if (row) row.classList.remove('staff-row-deleting');
+      btn._rowRef = row;
+      if (modal) modal.style.display = 'flex';
+    });
+  });
+
+  if (cancelBtn) {
+    cancelBtn.onclick = () => {
+      if (modal) modal.style.display = 'none';
+      pendingDeleteUserId = null;
+    };
+  }
+
+  if (confirmBtn) {
+    confirmBtn.onclick = async () => {
+      if (!pendingDeleteUserId) return;
+      // Find the row for animation
+      let row = null;
+      tbody.querySelectorAll('.delete-staff-btn').forEach(btn => {
+        if (btn.dataset.userId == pendingDeleteUserId && btn._rowRef) row = btn._rowRef;
+      });
+      try {
+        const response = await fetch(getApiUrl('delete-staff.php'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: pendingDeleteUserId })
+        });
+        const result = await response.json();
+        if (result.success) {
+          if (row) {
+            row.classList.add('staff-row-deleting');
+            setTimeout(() => {
+              if (modal) modal.style.display = 'none';
+              loadStaffData();
+            }, 700);
+          } else {
+            if (modal) modal.style.display = 'none';
+            loadStaffData();
+          }
+        } else {
+          alert(result.message || 'Failed to delete staff.');
+          if (modal) modal.style.display = 'none';
+        }
+      } catch (err) {
+        alert('Error deleting staff.');
+        console.error(err);
+        if (modal) modal.style.display = 'none';
+      }
+      pendingDeleteUserId = null;
+    };
+  }
 
   // Department select listeners
   tbody.querySelectorAll('.dept-select').forEach(select => {
